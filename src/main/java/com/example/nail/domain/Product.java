@@ -18,14 +18,14 @@ public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String nameProduct;
+    private String name;
 
     private BigDecimal price;
 
     private String description;
 
     @ManyToOne
-    private File posterProduct;
+    private File poster;
 
     @OneToMany(mappedBy = "product")
     private List<File> images;

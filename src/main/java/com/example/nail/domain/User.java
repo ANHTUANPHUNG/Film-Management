@@ -1,6 +1,7 @@
 package com.example.nail.domain;
 
 import com.example.nail.domain.eNum.ELock;
+import com.example.nail.domain.eNum.ERole;
 import com.example.nail.domain.eNum.EType;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -32,6 +33,9 @@ public class User {
 
     @Enumerated(value = EnumType.STRING)
     private ELock eLock;
+
+    @Enumerated(value = EnumType.STRING)
+    private ERole eRole;
 
     @Enumerated(value = EnumType.STRING)
     private EType type;

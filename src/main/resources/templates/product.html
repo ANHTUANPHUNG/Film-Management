@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<th:block th:replace="~{layout.html :: header}"></th:block>
+<style>
+    th {
+        text-align: center; /* Căn nội dung trong th ra giữa */
+    }
+</style>
+<div class="container">
+<div style="border-radius: 37px; background-color: white">    <h1 class="card-header" style="text-align: center">Nail Service</h1>
+</div>
+    <br>
+    <!-- Modal -->
+    <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+         aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog" style="max-width: 600px">
+            <div class="modal-content">
+                <div class="modal-header" style="display: flex;justify-content: center">
+                    <h4 class="modal-title" id="staticBackdropLabel"  >Modal title</h4>
+<!--                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" id="color"></button>-->
+                </div>
+                <div class="modal-body">
+                    <form id="productForm" >
+                        <div class="form-group col-12" onsubmit="return validateForm()">
+                            <label for="name">Name:</label>
+                            <input type="text" class="form-control" id="name" name="name" placeholder="Họ và tên" required onchange="validateName(this)">
+                            <div id="nameError" class="error-message" style="color: red;"></div>
+                        </div>
+                        <div class="form-group col-12">
+                            <label for="description">Description</label>
+                            <input type="text" class="form-control" id="description" placeholder="Mô tả sản phẩm" name="description" required onchange="validateDescription(this)">
+                            <div id="descriptionError" class="error-message" style="color: red;"></div>
+
+                        </div>
+                        <div class="form-group col-lg-12">
+                            <label for="price">Price</label>
+                            <input type="text" class="form-control" id="price" placeholder="Gía tiền" required name="price"  onchange="validatePrice(this)">
+                            <div id="priceError" class="error-message" style="color: red;"></div>
+                        </div>
+
+                        <div>
+                            <div>Poster:</div>
+                            <div>
+                                <label id="poster" for="post">
+                                    <i id="uploadIcon" class="fas fa-upload" style="font-size: 95px;"></i>
+                                </label>
+                                <input id="post" class="d-none" type="file" accept="image/*"  onchange="previewPoster(event)">
+                                <div id="posterError" class="error-message" style="color: red;"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div >Image:</div>
+                            <div id="images" class="row" style="display: flex; margin-left: 1px " ></div>
+                            <label id="image" for="file" style="display: flex; flex-wrap: wrap; max-width: 19%">
+                                <i class="fas fa-upload" style="font-size: 95px; margin: 5px"></i>
+                            </label>
+                            <input id="file" class="d-none" type="file" multiple="multiple"  accept="image/*" onchange="previewImage(event)">
+                            <div id="imagesError" class="error-message" style="color: red;"></div>
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn "  id="save"  onclick="validateForm()">Save changes</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card">
+        <div style="display: flex ; justify-content: space-evenly">
+            <div style="width: 20%;height: 65px">
+                <button style="background-color: #ea9797; margin: 12px; color: beige" type="button" class="btn   " data-bs-toggle="modal" data-bs-target="#staticBackdrop" id="create">
+                    Create Service
+                </button>
+            </div>
+            <nav
+                    class="layout-navbar container-xxl navbar navbar-expand-xl navbar-detached align-items-center bg-navbar-theme"
+                    id="layout-navbar"
+            >
+                <div class="layout-menu-toggle navbar-nav align-items-xl-center me-3 me-xl-0 d-xl-none">
+                    <a class="nav-item nav-link px-0 me-xl-4" href="javascript:void(0)">
+                        <i class="bx bx-menu bx-sm"></i>
+                    </a>
+                </div>
+
+                <div class="navbar-nav-right d-flex align-items-center" id="navbar-collapse">
+                    <!-- Search -->
+                    <div class="navbar-nav align-items-center">
+                        <div class="nav-item d-flex align-items-center" style="width: 300px">
+                            <input
+                                    width="329px"
+                                    type="search"
+                                    class="form-control border-0 shadow-none"
+                                    placeholder="Search..."
+                                    aria-label="Search..."
+                                    id ="search"
+                            />
+                        </div>
+                    </div>
+                    <!-- /Search -->
+
+                </div>
+            </nav>
+            <div id="priceRange1">
+                <div class="input-group"  style="margin: 12px;width: 157px;height: 40px">
+                    <label for="priceRange" id="pri"></label><select class="form-control" id="priceRange">
+                    <option value="0-50000000000" selected>----Choose----</option>
+                    <option value="0-100">Dưới 100 đồng</option>
+                    <option value="100-500">Từ 100 đến 500 đồng</option>
+                    <option value="501-1000">Từ 501 đến 1000 đồng</option>
+                    <option value="1001-2000">Từ 1001 đến 2000 đồng</option>
+                </select>
+
+                </div>
+            </div>
+        </div>
+        <table class="table table-bordered table-striped">
+            <tr>
+                <th style="width: 30px">No</th>
+                <th style="width: 150px">Name</th>
+                <th style="width: 150px">Description</th>
+                <th id="price-check" class="arrow arrow-up" style="width: 100px">
+                    <span >Price &#9660;</span>
+                </th>
+                <th >Poster</th>
+                <th >Action</th>
+            </tr>
+            <tbody id="tBody">
+            </tbody>
+        </table>
+        <div class="d-flex justify-content-end">
+            <nav aria-label="...">
+                <ul class="pagination" id="pagination">
+
+                </ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+<th:block th:replace="~{layout.html :: footer}"></th:block>
+<script src="/myjs/product.js"></script>
+<script>
+
+
+</script>
+
+
+</html>

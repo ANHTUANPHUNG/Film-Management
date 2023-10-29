@@ -1,0 +1,146 @@
+.error {
+    color: red;
+    padding: 3px;
+    display: none;
+}
+
+.input-custom:invalid[focused="true"]~span {
+    display: block;
+}
+th#price-check:hover {
+    cursor: pointer;
+}
+.alertify-notifier {
+    position: fixed;
+    top: 0;
+    right: 10px;
+    transform: translateX(-50%);
+    width: 100%;
+    z-index: 9999; /* Đảm bảo nó nằm trên cùng */
+}
+.select-selection {
+    border-radius: 0 !important;
+}
+/* CSS cho hình ảnh trước khi tải lên */
+#poster-preview {
+    max-width: 200px; /* Điều chỉnh kích thước tối đa của hình ảnh */
+    height: auto;
+    margin-top: 10px;
+}
+
+.slide-image-preview {
+    max-width: 100px; /* Điều chỉnh kích thước tối đa của hình ảnh slide */
+    height: auto;
+    margin-right: 10px;
+}
+.input-custom:invalid[focused="true"]~span {
+    display: block;
+}
+.input-custom:invalid[focused="true"] {
+    border-color: red !important;
+}
+
+
+.LOCK {
+    background: aquamarine;
+    border: aquamarine;
+    font-weight: bold;
+}
+
+.UNLOCK {
+    background: darkslateblue;
+    border: darkslateblue;
+    color: whitesmoke;
+    font-weight: bold;
+}
+
+.avatar-preview{
+    width: 500px;
+    height: 300px;
+    object-fit: cover;
+    margin-right: 1em;
+}
+.avatar-away{
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    margin-right: 1em;
+}
+.avatar-away:hover{
+    width: 100px;
+    height: 100px;
+}
+.avatar-previews{
+    width: 150px;
+    height: 100px;
+    object-fit: cover;
+}
+#save {
+    background-color: #ea9797;
+
+    color: white;
+}
+#save:hover{
+    background-color: #f43333;
+}
+#layout-navbar{
+    width: 350px;
+    height: 40px;
+}
+.enlarge-image {
+    max-width: 100%; /* Kích thước tối đa ban đầu */
+    transition: transform 0.3s; /* Thời gian chuyển đổi */
+    cursor: pointer; /* Kiểu con trỏ khi rê chuột vào */
+    border-radius: 7px;
+}
+
+.enlarge-image:hover {
+    transform: scale(1.2); /* Kích thước lớn hơn khi hover */
+
+}
+
+.image-preview {
+    /*margin: 10px;*/
+    position: relative;
+}
+
+.image-container {
+    position: relative;
+}
+
+.delete-icon {
+    position: absolute;
+    top: -10px;
+    right: -19px;
+    cursor: pointer;
+    color: black;
+}
+#create:hover{
+    font-size: 110%;
+}
+.priceRange:hover{
+    cursor: pointer;
+}
+.delete:hover{
+    font-size: 120%;
+
+}
+
+.edit:hover{
+    font-size: 120%;
+
+}
+
+.detail:hover{
+    font-size: 120%;
+}
+tr{
+
+}
+/*#poster[data-form="edit"] .fa-upload:before{*/
+/*    content: none !important;*/
+/*}*/
+/*#poster[data-form="edit"]{*/
+/*    width: 150px;*/
+/*    height: 100px;*/
+/*}*/
