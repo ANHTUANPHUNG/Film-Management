@@ -19,5 +19,8 @@ public class ProductEditResponse {
     private BigDecimal price;
 
     private String poster;
-    private List<FileResponse> images;
+    private String idPoster;
+    private List<String> images;
+    private List<String> idImages;
+
 }

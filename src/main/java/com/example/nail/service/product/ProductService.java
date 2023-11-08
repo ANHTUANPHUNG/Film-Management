@@ -18,6 +18,7 @@ import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -31,7 +32,7 @@ public class ProductService {
     private final ProductRepository productRepository;
     private final FileRepository fileRepository;
 
-    public void createProduct(ProductSaveRequest request){
+    public ResponseEntity<?> createProduct(ProductSaveRequest request){
         var product = AppUtil.mapper.map(request, Product.class);
         productRepository.save(product);
         var images = fileRepository.findAllById(request.getImages().stream().map(SelectOptionRequest::getId).collect(Collectors.toList()));
@@ -39,6 +40,8 @@ public class ProductService {
             image.setProduct(product);
         }
         fileRepository.saveAll(images);
+        return ResponseEntity.ok("Sản phẩm đã được tạo thành công.");
+
     }
     public Page<ProductListResponse> showListProduct(String search, Pageable pageable, BigDecimal min, BigDecimal max){
         search = "%" + search + "%";
@@ -70,24 +73,36 @@ public class ProductService {
                 (String.format(AppMessage.ID_NOT_FOUND, "User", id)));
         var result = AppUtil.mapper.map(product, ProductEditResponse.class);
         result.setPoster(product.getPoster().getFileUrl());
-        List<FileResponse> images = product.getImages()
+        result.setIdPoster(product.getPoster().getId());
+        List<String> images = product.getImages()
                 .stream()
                 .map(File::getFileUrl)
                 .collect(Collectors.toList());
 
         result.setImages(images);
+        List<String> idImages = product.getImages().stream().map(File::getId).toList();
+        result.setIdImages(idImages);
         return result;
     }
     @Transactional
     public void update(ProductEditRequest request, Long id) throws Exception {
         var productDB = findById(id);
-        fileRepository.deleteAllByProductId(id);
+            productDB.getImages().forEach(e -> {
+            e.setProduct(null);
+            fileRepository.save(e);
+        });
         var images = fileRepository.findAllById(request.getImages().stream().map(SelectOptionRequest::getId).collect(Collectors.toList()));
         for (var image: images) {
             image.setProduct(productDB);
         }
+        productDB.setName(request.getName());
+        productDB.setDescription(request.getDescription());
+        productDB.setPrice(new BigDecimal(request.getPrice()));
+        if(request.getPoster() != null && request.getPoster().getId() !=null){
+            productDB.setPoster(File.builder().id(request.getPoster().getId()).build());
+        }
+
         fileRepository.saveAll(images);
-        AppUtil.mapper.map(request, productDB);
         productRepository.save(productDB);
     }
     public List<SelectOptionResponse> findAll() {

@@ -5,6 +5,67 @@
     th {
         text-align: center; /* Căn nội dung trong th ra giữa */
     }
+    td{
+        text-align: center; /* Căn nội dung trong th ra giữa */
+    }
+    option{
+        text-align: center; /* Căn nội dung trong th ra giữa */
+    }
+    @keyframes slideLeft {
+        0%{
+            transform: translateX(100%);
+        }
+        100%{
+            transform: translateX(0);
+        }
+    }
+    @keyframes slideRight {
+        0%{
+            transform: translateX(-100%);
+        }
+        100%{
+            transform: translateX(0);
+        }
+    }
+    .main{
+        height: 332px;
+        margin-bottom: 10px  ;
+        position: relative;
+    }
+    #list-image{
+        width: 95%;
+        height: 100%;
+        justify-content: space-between;
+        display: flex
+    }
+    #list-image div{
+        flex: 1;
+    }
+    #list-image img {
+
+        object-fit: cover;
+        object-position: center;
+    }
+    .control{
+        position: absolute;
+        top: 33%;
+        font-size: 70px;
+        color: black;
+    }
+    .prev{
+        left: 16px;
+    }
+    .next{
+        right: 16px;
+    }
+    #img-feature{
+        width: 100%;
+        height: 100%;
+    }
+    #img-feature{
+        transition: 1s;
+        animation: slideLeft 1s ease-in-out forwards ;
+    }
 </style>
 <div class="container">
 <div style="border-radius: 37px; background-color: white">    <h1 class="card-header" style="text-align: center">Nail Service</h1>
@@ -20,33 +81,35 @@
 <!--                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" id="color"></button>-->
                 </div>
                 <div class="modal-body">
-                    <form id="productForm" >
-                        <div class="form-group col-12" onsubmit="return validateForm()">
+                    <form id="productForm"  >
+                        <div class="form-group col-12" >
                             <label for="name">Name:</label>
-                            <input type="text" class="form-control" id="name" name="name" placeholder="Họ và tên" required onchange="validateName(this)">
+                            <input type="text" class="form-control" id="name" name="name" placeholder="Họ và tên"  >
                             <div id="nameError" class="error-message" style="color: red;"></div>
                         </div>
                         <div class="form-group col-12">
                             <label for="description">Description</label>
-                            <input type="text" class="form-control" id="description" placeholder="Mô tả sản phẩm" name="description" required onchange="validateDescription(this)">
+                            <input type="text" class="form-control" id="description" placeholder="Mô tả sản phẩm" name="description"  >
                             <div id="descriptionError" class="error-message" style="color: red;"></div>
 
                         </div>
                         <div class="form-group col-lg-12">
                             <label for="price">Price</label>
-                            <input type="text" class="form-control" id="price" placeholder="Gía tiền" required name="price"  onchange="validatePrice(this)">
+                            <input type="text" class="form-control" id="price" placeholder="Gía tiền"  name="price"  >
                             <div id="priceError" class="error-message" style="color: red;"></div>
                         </div>
 
                         <div>
                             <div>Poster:</div>
                             <div>
-                                <label id="poster" for="post">
+                                <label id="poster" for="post" >
                                     <i id="uploadIcon" class="fas fa-upload" style="font-size: 95px;"></i>
                                 </label>
-                                <input id="post" class="d-none" type="file" accept="image/*"  onchange="previewPoster(event)">
-                                <div id="posterError" class="error-message" style="color: red;"></div>
+                                <div id="posterError" class="error-message" style="color: red;">aa</div>
+
+                                <input id="post" class="d-none" type="file" accept="image/*"   onchange="previewPoster(event)">
                             </div>
+
                         </div>
                         <div>
                             <div >Image:</div>
@@ -60,13 +123,39 @@
 
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                            <button type="submit" class="btn "  id="save"  onclick="validateForm()">Save changes</button>
+                            <button type="submit" class="btn "  id="save"  >Save changes</button>
                         </div>
                     </form>
                 </div>
             </div>
         </div>
     </div>
+    <div class="modal fade" id="showImagesList" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+         aria-labelledby="showImagesListLabel" aria-hidden="true">
+        <div class="modal-dialog" style="max-width: 600px">
+            <div class="modal-content">
+                <div class="modal-header" style="display: flex;justify-content: center">
+                    <h4 class="modal-title" id="showImagesListLabel" style="margin-left: 206px">List Images</h4>
+                    <i class="fas fa-times" style="margin-left: 201px" id="iconNone"></i>
+
+                </div>
+                <div class="modal-body">
+                    <div id="main" style="margin-bottom: 10px">
+                        <img id="img-feature" >
+<!--                        <div class="control prev">-->
+<!--                            <i class="bx bx-chevron-left" style="font-size: 30px ;transform: translateY(-50%)"></i>-->
+<!--                        </div>-->
+<!--                        <div class="control next">-->
+<!--                            <i class="bx bx-chevron-right" style="font-size: 30px;transform: translateY(-50%)"></i>-->
+<!--                        </div>-->
+                    </div>
+                    <div id="list-image" >
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="card">
         <div style="display: flex ; justify-content: space-evenly">
             <div style="width: 20%;height: 65px">
@@ -106,10 +195,9 @@
                 <div class="input-group"  style="margin: 12px;width: 157px;height: 40px">
                     <label for="priceRange" id="pri"></label><select class="form-control" id="priceRange">
                     <option value="0-50000000000" selected>----Choose----</option>
-                    <option value="0-100">Dưới 100 đồng</option>
-                    <option value="100-500">Từ 100 đến 500 đồng</option>
-                    <option value="501-1000">Từ 501 đến 1000 đồng</option>
-                    <option value="1001-2000">Từ 1001 đến 2000 đồng</option>
+                    <option value="10000-100000">Dưới 10000 </option>
+                    <option value="100001-500000">Trên 100000</option>
+                    <option value="500001-1000000">Trên 500000</option>
                 </select>
 
                 </div>

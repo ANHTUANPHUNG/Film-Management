@@ -5,6 +5,7 @@ import com.example.nail.service.product.request.ProductEditRequest;
 import com.example.nail.service.product.request.ProductSaveRequest;
 import com.example.nail.service.product.response.ProductEditResponse;
 import com.example.nail.service.product.response.ProductListResponse;
+import com.example.nail.util.AppUtil;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -12,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
@@ -23,8 +25,14 @@ public class ProductRestController {
     private final ProductService productService;
 
     @PostMapping
-    public void createProduct(@RequestBody ProductSaveRequest productSaveRequest){
-        productService.createProduct(productSaveRequest);
+    public ResponseEntity<?> createProduct(@RequestBody ProductSaveRequest productSaveRequest , BindingResult bindingResult){
+        new ProductSaveRequest().validate(productSaveRequest, bindingResult);
+
+        if (bindingResult.hasFieldErrors()) {
+            return AppUtil.mapErrorToResponse(bindingResult);
+        }
+        return new ResponseEntity<>(productService.createProduct(productSaveRequest), HttpStatus.CREATED);
+
     }
     @GetMapping
     public ResponseEntity<Page<ProductListResponse>> list(@PageableDefault(size = 5) Pageable pageable,
