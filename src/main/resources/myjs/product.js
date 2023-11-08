@@ -125,55 +125,55 @@ function getDataFromProduct(form) {
 
 // xử lí khi nhấn submit
 productForm.onsubmit = async (e) => {
-    // const nameInput = document.getElementById("name");
-    // const descriptionInput = document.getElementById("description");
-    // const priceInput = document.getElementById("price");
-    // const posterInput = document.getElementById("post");
-    // const imagesInput = document.getElementById("file");
-    //
-    // const nameError = document.getElementById("nameError");
-    // const descriptionError = document.getElementById("descriptionError");
-    // const priceError = document.getElementById("priceError");
-    // const posterError = document.getElementById("posterError");
-    // const imagesError = document.getElementById("imagesError");
-    // let hasError = false;
-    //
-    // if (nameInput.value.trim() === "") {
-    //     nameError.textContent = "Tên sản phẩm là trường bắt buộc.";
-    //     hasError = true;
-    // } else {
-    //     nameError.textContent = ''; // Xóa thông báo lỗi nếu hợp lệ
-    // }
-    //
-    // if (descriptionInput.value.trim() === "") {
-    //     descriptionError.textContent = "Mô tả sản phẩm là trường bắt buộc.";
-    //     hasError = true;
-    // } else {
-    //     descriptionError.textContent = ''; // Xóa thông báo lỗi nếu hợp lệ
-    // }
-    //
-    // if (priceInput.value.trim() === "") {
-    //     priceError.textContent = "Giá sản phẩm là trường bắt buộc và phải là số.";
-    //     hasError = true;
-    // } else {
-    //     priceError.textContent = ''; // Xóa thông báo lỗi nếu hợp lệ
-    // }
-    //
-    // if(document.getElementById("staticBackdropLabel").innerText === "Create Service"){
-    //     if ( posterInput.value.trim() === "") {
-    //         posterError.textContent = "Poster là trường bắt buộc.";
-    //         hasError = true;
-    //     } else {
-    //         posterError.textContent = ''; // Xóa thông báo lỗi nếu hợp lệ
-    //     }
-    // }
-    //
-    //
-    //
-    // if (hasError){
-    //     e.preventDefault();
-    //     return;
-    // }
+    const nameInput = document.getElementById("name");
+    const descriptionInput = document.getElementById("description");
+    const priceInput = document.getElementById("price");
+    const posterInput = document.getElementById("post");
+    const imagesInput = document.getElementById("file");
+
+    const nameError = document.getElementById("nameError");
+    const descriptionError = document.getElementById("descriptionError");
+    const priceError = document.getElementById("priceError");
+    const posterError = document.getElementById("posterError");
+    const imagesError = document.getElementById("imagesError");
+    let hasError = false;
+
+    if (nameInput.value.trim() === "") {
+        nameError.textContent = "Tên sản phẩm là trường bắt buộc.";
+        hasError = true;
+    } else {
+        nameError.textContent = ''; // Xóa thông báo lỗi nếu hợp lệ
+    }
+
+    if (descriptionInput.value.trim() === "") {
+        descriptionError.textContent = "Mô tả sản phẩm là trường bắt buộc.";
+        hasError = true;
+    } else {
+        descriptionError.textContent = ''; // Xóa thông báo lỗi nếu hợp lệ
+    }
+
+    if (priceInput.value.trim() === "") {
+        priceError.textContent = "Giá sản phẩm là trường bắt buộc và phải là số.";
+        hasError = true;
+    } else {
+        priceError.textContent = ''; // Xóa thông báo lỗi nếu hợp lệ
+    }
+
+    if(document.getElementById("staticBackdropLabel").innerText === "Create Service"){
+        if ( posterInput.value.trim() === "") {
+            posterError.textContent = "Poster là trường bắt buộc.";
+            hasError = true;
+        } else {
+            posterError.textContent = ''; // Xóa thông báo lỗi nếu hợp lệ
+        }
+    }
+
+
+
+    if (hasError){
+        e.preventDefault();
+        return;
+    }
 
     let data = getDataFromProduct(productForm);
     idImages=[];
@@ -251,31 +251,22 @@ async function createProduct(data) {
             }
         });
     } else {
-        const errorData = await response.json(); // Trích xuất dữ liệu JSON từ phản hồi body
-        console.log(errorData);
+        const errorData = await response.json();
+        let errorMessage = '';
+
+        for (const key in errorData) {
+            if (errorData.hasOwnProperty(key)) {
+                errorMessage += `${key}: ${errorData[key]}\n`;
+            }
+        }
+
         Swal.fire({
             title: 'Error',
-            text: 'Có lỗi xảy ra khi tạo sản phẩm.',
+            text: errorMessage,
             icon: 'error',
             confirmButtonText: 'OK'
         });
     }
-
-    /**
-     const response = await fetch('/api/products', {
-
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(data)
-    });
-     if (response.ok) {
-        //
-    }else {
-        // lấy data response body trả về ở đây thì sao
-     }
-     */
 }
 
 const findById = async (id) => {
@@ -381,9 +372,18 @@ async function  editProduct (data){
             }
         })
     } else {
+        const errorData = await response.json();
+        let errorMessage = '';
+
+        for (const key in errorData) {
+            if (errorData.hasOwnProperty(key)) {
+                errorMessage += `${key}: ${errorData[key]}\n`;
+            }
+        }
+
         Swal.fire({
             title: 'Error',
-            text: 'Có lỗi xảy ra khi sửa sản phẩm.',
+            text: errorMessage,
             icon: 'error',
             confirmButtonText: 'OK'
         });
@@ -454,6 +454,9 @@ function clearForm() {
     document.getElementById('nameError').innerText = '';
     document.getElementById('posterError').innerText = '';
     document.getElementById('imagesError').innerText = '';
+    document.getElementById('name').style.border = '1px solid #d9dee3';
+    document.getElementById('description').style.border = '1px solid #d9dee3';
+    document.getElementById('price').style.border = '1px solid #d9dee3';
     const imagesEle = document.getElementById("images");
     imagesEle.innerHTML = '';
     const imageChild = imagesEle.querySelectorAll('img');
@@ -698,76 +701,76 @@ for (var i = 0; i < eMenubar.length; i++) {
 }
 document.getElementById("menu-service").classList.add("active");
 
-// function validateName(inputField) {
-//     const nameValue = inputField.value;
-//     const nameError = document.getElementById("nameError");
-//     const saveButton = document.getElementById("save");
-//     const name = document.getElementById("name");
-//     const vietnameseWithDiacriticsAndLetterRegex = /^[A-Za-zÀ-ỹ\s]*[A-Za-zÀ-ỹ]+[A-Za-zÀ-ỹ\s]*$/;
-//     if (!vietnameseWithDiacriticsAndLetterRegex.test(nameValue)) {
-//         nameError.textContent = "Tên sản phẩm phải chứa ít nhất một chữ cái và không được có số.";
-//         name.style.border= "1px solid red"
-//         nameError.style.fontSize = "14px";
-//         saveButton.disabled = true;
-//         saveButton.style.opacity = 0.5;
-//     } else {
-//         nameError.textContent = '';
-//         name.style.border= "1px solid #d9dee3"
-//
-//         saveButton.disabled = false;
-//         saveButton.style.opacity = 1;
-//
-//     }
-// }
-//
-// function validateDescription(inputField) {
-//     const descriptionValue = inputField.value;
-//     const descriptionError = document.getElementById("descriptionError");
-//     const saveButton = document.getElementById("save");
-//     const description = document.getElementById("description");
-//
-//     const validDescriptionRegex = /^[^\d]*[A-Za-zÀ-ỹ][^\d]*$/;
-//
-//     if (!validDescriptionRegex.test(descriptionValue)) {
-//         descriptionError.textContent = "Mô tả sản phẩm phải chứa ít nhất một chữ cái và không được chứa số.";
-//         descriptionError.style.fontSize = "14px"; // Điều chỉnh font size ở đây (ví dụ: 14px)
-//         saveButton.disabled = true;
-//         saveButton.style.opacity = 0.5;
-//         description.style.border= "1px solid red"
-//     } else {
-//         descriptionError.textContent = '';
-//         saveButton.disabled = false;
-//         saveButton.style.opacity = 1;
-//         description.style.border= "1px solid #d9dee3"
-//
-//     }
-// }
-//
-//
-// function validatePrice(inputField) {
-//     const priceValue = inputField.value;
-//     const priceError = document.getElementById("priceError");
-//     const saveButton = document.getElementById("save");
-//     const price = document.getElementById("price");
-//
-//     // Kiểm tra xem giá trị có phải là một số hợp lệ và nằm trong khoảng từ 10.000 đến 1.000.000 hay không
-//     const isValidPrice = !isNaN(priceValue) && parseFloat(priceValue) >= 10000 && parseFloat(priceValue) <= 1000000;
-//
-//     if (!isValidPrice) {
-//         priceError.textContent = "Giá trị không hợp lệ. Vui lòng nhập số từ 10.000đ đến 1.000.000đ.";
-//         priceError.style.fontSize = "14px"; // Điều chỉnh font size ở đây (ví dụ: 14px)
-//         saveButton.disabled = true;
-//         saveButton.style.opacity = 0.5;
-//         price.style.border= "1px solid red"
-//
-//     } else {
-//         priceError.textContent = ''; // Xóa thông báo lỗi nếu giá trị hợp lệ
-//         saveButton.disabled = false;
-//         saveButton.style.opacity = 1;
-//         price.style.border= "1px solid #d9dee3"
-//
-//     }
-// }
+function validateName(inputField) {
+    const nameValue = inputField.value;
+    const nameError = document.getElementById("nameError");
+    const saveButton = document.getElementById("save");
+    const name = document.getElementById("name");
+    const vietnameseWithDiacriticsAndLetterRegex = /^[A-Za-zÀ-ỹ\s]*[A-Za-zÀ-ỹ]+[A-Za-zÀ-ỹ\s]*$/;
+    if (!vietnameseWithDiacriticsAndLetterRegex.test(nameValue)) {
+        nameError.textContent = "Tên sản phẩm phải chứa ít nhất một chữ cái và không được có số.";
+        name.style.border= "1px solid red"
+        nameError.style.fontSize = "14px";
+        saveButton.disabled = true;
+        saveButton.style.opacity = 0.5;
+    } else {
+        nameError.textContent = '';
+        name.style.border= "1px solid #d9dee3"
+
+        saveButton.disabled = false;
+        saveButton.style.opacity = 1;
+
+    }
+}
+
+function validateDescription(inputField) {
+    const descriptionValue = inputField.value;
+    const descriptionError = document.getElementById("descriptionError");
+    const saveButton = document.getElementById("save");
+    const description = document.getElementById("description");
+
+    const validDescriptionRegex = /^[^\d]*[A-Za-zÀ-ỹ][^\d]*$/;
+
+    if (!validDescriptionRegex.test(descriptionValue)) {
+        descriptionError.textContent = "Mô tả sản phẩm phải chứa ít nhất một chữ cái và không được chứa số.";
+        descriptionError.style.fontSize = "14px"; // Điều chỉnh font size ở đây (ví dụ: 14px)
+        saveButton.disabled = true;
+        saveButton.style.opacity = 0.5;
+        description.style.border= "1px solid red"
+    } else {
+        descriptionError.textContent = '';
+        saveButton.disabled = false;
+        saveButton.style.opacity = 1;
+        description.style.border= "1px solid #d9dee3"
+
+    }
+}
+
+
+function validatePrice(inputField) {
+    const priceValue = inputField.value;
+    const priceError = document.getElementById("priceError");
+    const saveButton = document.getElementById("save");
+    const price = document.getElementById("price");
+
+    // Kiểm tra xem giá trị có phải là một số hợp lệ và nằm trong khoảng từ 10.000 đến 1.000.000 hay không
+    const isValidPrice = !isNaN(priceValue) && parseFloat(priceValue) >= 10000 && parseFloat(priceValue) <= 1000000;
+
+    if (!isValidPrice) {
+        priceError.textContent = "Giá trị không hợp lệ. Vui lòng nhập số từ 10.000đ đến 1.000.000đ.";
+        priceError.style.fontSize = "14px"; // Điều chỉnh font size ở đây (ví dụ: 14px)
+        saveButton.disabled = true;
+        saveButton.style.opacity = 0.5;
+        price.style.border= "1px solid red"
+
+    } else {
+        priceError.textContent = ''; // Xóa thông báo lỗi nếu giá trị hợp lệ
+        saveButton.disabled = false;
+        saveButton.style.opacity = 1;
+        price.style.border= "1px solid #d9dee3"
+
+    }
+}
 
 
 
@@ -783,59 +786,67 @@ const onShowDetail = async (id) => {
     document.getElementById('main').appendChild(imgFeature);
 
     productSelected = await findById(id);
-    productSelected.images.forEach((img, index) => {
-        const imagesListShow = document.getElementById('list-image');
-        const imagePreview = document.createElement("div");
-        imagePreview.classList.add("image-preview");
-        imagePreview.classList.add("col-3");
-        imagePreview.style.width = "99px";
-        imagePreview.style.height = "99px";
-        imagePreview.style.marginRight = "5px";
-        imagePreview.style.display ="flex";
-        imagePreview.style.justifyContent ="center";
-        imagePreview.style.alignItems ="center";
+    if (productSelected.images.length === 0) {
+        document.getElementById('notification').innerText= "không có ảnh"
+    } else {
+        document.getElementById('notification').innerText= ""
+        productSelected.images.forEach((img, index) => {
+            const imagesListShow = document.getElementById('list-image');
+            const imagePreview = document.createElement("div");
+            imagePreview.classList.add("image-preview");
+            imagePreview.classList.add("col-3");
+            imagePreview.style.width = "99px";
+            imagePreview.style.height = "99px";
+            imagePreview.style.marginRight = "5px";
+            imagePreview.style.display = "flex";
+            imagePreview.style.justifyContent = "center";
+            imagePreview.style.alignItems = "center";
 
-        const image = document.createElement('img');
-        image.style.height = "94%";
-        image.style.width = "94%";
-        image.src = img;
-        image.id = index;
-        image.alt = "Selected Image";
-        image.classList.add('image-preview');
-        imagePreview.appendChild(image)
-        imagesListShow.appendChild(imagePreview);
-        if (index === 0 ) {
-            imgFeature.src = img;
-            imagePreview.classList.add('active');
+            const image = document.createElement('img');
+            image.style.height = "94%";
+            image.style.width = "94%";
+            image.src = img;
+            image.id = index;
+            image.alt = "Selected Image";
+            image.classList.add('image-previews');
+            imagePreview.appendChild(image)
+            imagesListShow.appendChild(imagePreview);
+            if (index === 0) {
+                imgFeature.src = img;
+                imagePreview.classList.add('active');
 
-        }
-        document.querySelectorAll('#list-image div').forEach(item => {
-            item.classList.remove('active');
+            }
+            document.querySelectorAll('#list-image div').forEach(item => {
+                item.classList.remove('active');
+            });
+            image.addEventListener('click', () => {
+
+                imgFeature.src = image.getAttribute('src');
+                imagePreview.classList.add('active');
+
+            });
+            // document.getElementById('active').style.backgroundColor='red';
+
+            imgFeature.style.width = "550px";
+            imgFeature.style.height = "414px";
+            imgFeature.style.border="1px solid deeppink"
         });
-        image.addEventListener('click', () => {
-
-            imgFeature.src = image.getAttribute('src');
-            imagePreview.classList.add('active');
-
-        });
-        // document.getElementById('active').style.backgroundColor='red';
-
-        imgFeature.style.width ="550px";
-        imgFeature.style.height ="414px";
-    });
-
+    }
     $('#showImagesList').modal('show');
 
     let currentIndex = 0;
     let intervalId; // Biến để lưu ID của interval
 
-    const imagePreviews = document.querySelectorAll('#list-image .image-preview');
-    const imageCount = imagePreviews.length/2;
+    const imagePreviews = document.querySelectorAll('#list-image .image-preview ');
+    const imageCount = imagePreviews.length;
     intervalId =  setInterval(() => {
         imagePreviews[currentIndex].classList.remove('active');
+        imagePreviews[currentIndex].style.backgroundColor= "white"
+
         console.log((currentIndex + 1) % imageCount)
         currentIndex = (currentIndex + 1) % imageCount;
         imagePreviews[currentIndex].classList.add('active');
+        imagePreviews[currentIndex].style.backgroundColor= "purple"
         imgFeature.src = productSelected.images[currentIndex];
 
     }, 3000);

@@ -52,7 +52,12 @@ public class ProductRestController {
         return  new ResponseEntity<>(productService.findByIdProduct(id),HttpStatus.OK);
     }
     @PutMapping("/{id}")
-    public ResponseEntity<Void> update(@RequestBody @Valid ProductEditRequest request, @PathVariable Long id) throws Exception {
+    public ResponseEntity<?> update(@RequestBody  ProductEditRequest request , BindingResult bindingResult, @PathVariable Long id) throws Exception {
+        new ProductEditRequest().validate(request, bindingResult);
+
+        if (bindingResult.hasFieldErrors()) {
+            return AppUtil.mapErrorToResponse(bindingResult);
+        }
         productService.update(request,id);
         return ResponseEntity.noContent().build();
     }

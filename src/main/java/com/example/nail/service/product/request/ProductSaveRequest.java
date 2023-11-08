@@ -31,24 +31,24 @@ public class ProductSaveRequest implements Validator {
         String name = productSaveRequest.name;
         String description = productSaveRequest.description;
         String price = productSaveRequest.price;
-        SelectOptionRequest poster = productSaveRequest.poster;
+//        SelectOptionRequest poster = productSaveRequest.poster;
 
         if (name.length() < 1) {
-            errors.rejectValue("name", "name.length", "Tên phải có ít nhất là 3 ký tự");
+            errors.rejectValue("Name", "name.length", "Tên phải có ít nhất là 1 ký tự");
         }
 
         if (description.length() < 1) {
-            errors.rejectValue("description", "description.length", "Địa chỉ phải có ít nhất là 3 ký tự");
+            errors.rejectValue("Description", "description.length", "Miêu tả chỉ phải có ít nhất là 1 ký tự");
         }
-        if (poster == null) {
-            errors.rejectValue("poster", "poster.null", "Poster không được để trống.");
-        }
+//        if (poster == null) {
+//            errors.rejectValue("poster", "poster.null", "Poster không được để trống.");
+//        }
         if (!isNumeric(price)) {
-            errors.rejectValue("price", "price.notNumeric", "Giá sản phẩm phải là một số.");
+            errors.rejectValue("Price", "price.notNumeric", "Giá sản phẩm phải là một số.");
         } else {
             double priceValue = Double.parseDouble(price);
             if (priceValue < 10000 || priceValue > 1000000) {
-                errors.rejectValue("price", "price.range", "Giá sản phẩm phải lớn hơn 10000 và bé hơn 1000000.");
+                errors.rejectValue("Price", "price.range", "Giá sản phẩm phải lớn hơn 10000 và bé hơn 1000000.");
             }
         }
     }

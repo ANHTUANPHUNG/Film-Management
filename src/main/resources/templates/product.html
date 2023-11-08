@@ -33,10 +33,11 @@
         position: relative;
     }
     #list-image{
-        width: 95%;
+        width: 100%;
         height: 100%;
         justify-content: space-between;
-        display: flex
+        display: flex;
+        border: 1px solid;
     }
     #list-image div{
         flex: 1;
@@ -84,18 +85,18 @@
                     <form id="productForm"  >
                         <div class="form-group col-12" >
                             <label for="name">Name:</label>
-                            <input type="text" class="form-control" id="name" name="name" placeholder="Họ và tên"  >
+                            <input type="text" class="form-control" id="name" name="name" placeholder="Họ và tên"  oninput="validateName(this)" >
                             <div id="nameError" class="error-message" style="color: red;"></div>
                         </div>
                         <div class="form-group col-12">
                             <label for="description">Description</label>
-                            <input type="text" class="form-control" id="description" placeholder="Mô tả sản phẩm" name="description"  >
+                            <input type="text" class="form-control" id="description" placeholder="Mô tả sản phẩm" name="description" oninput="validateDescription(this)" >
                             <div id="descriptionError" class="error-message" style="color: red;"></div>
 
                         </div>
                         <div class="form-group col-lg-12">
                             <label for="price">Price</label>
-                            <input type="text" class="form-control" id="price" placeholder="Gía tiền"  name="price"  >
+                            <input type="text" class="form-control" id="price" placeholder="Gía tiền"  name="price" oninput="validatePrice(this)" >
                             <div id="priceError" class="error-message" style="color: red;"></div>
                         </div>
 
@@ -136,18 +137,13 @@
             <div class="modal-content">
                 <div class="modal-header" style="display: flex;justify-content: center">
                     <h4 class="modal-title" id="showImagesListLabel" style="margin-left: 206px">List Images</h4>
-                    <i class="fas fa-times" style="margin-left: 201px" id="iconNone"></i>
+                    <i class="fas fa-times" style="margin-left: 201px; color: black" id="iconNone"></i>
 
                 </div>
                 <div class="modal-body">
                     <div id="main" style="margin-bottom: 10px">
+                        <div id="notification" style="font-size: 50px; color: #f1aca7;text-align: center"></div>
                         <img id="img-feature" >
-<!--                        <div class="control prev">-->
-<!--                            <i class="bx bx-chevron-left" style="font-size: 30px ;transform: translateY(-50%)"></i>-->
-<!--                        </div>-->
-<!--                        <div class="control next">-->
-<!--                            <i class="bx bx-chevron-right" style="font-size: 30px;transform: translateY(-50%)"></i>-->
-<!--                        </div>-->
                     </div>
                     <div id="list-image" >
                     </div>

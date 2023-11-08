@@ -137,6 +137,10 @@ th#price-check:hover {
 tr{
 
 }
+#iconNone:hover{
+    cursor: pointer;
+}
+
 /*#poster[data-form="edit"] .fa-upload:before{*/
 /*    content: none !important;*/
 /*}*/

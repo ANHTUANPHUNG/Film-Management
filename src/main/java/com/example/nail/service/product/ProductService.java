@@ -85,7 +85,7 @@ public class ProductService {
         return result;
     }
     @Transactional
-    public void update(ProductEditRequest request, Long id) throws Exception {
+    public ResponseEntity<?>  update(ProductEditRequest request, Long id) throws Exception {
         var productDB = findById(id);
             productDB.getImages().forEach(e -> {
             e.setProduct(null);
@@ -104,6 +104,8 @@ public class ProductService {
 
         fileRepository.saveAll(images);
         productRepository.save(productDB);
+        return ResponseEntity.ok("Sản phẩm đã được sửa thành công.");
+
     }
     public List<SelectOptionResponse> findAll() {
         return productRepository.findAll()
