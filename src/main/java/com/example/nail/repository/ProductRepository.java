@@ -20,8 +20,8 @@ public interface ProductRepository extends JpaRepository<Product,Long> {
     void  updatePoster(Long id);
     @Query(value = "SELECT p FROM Product p" +
             " WHERE (p.price BETWEEN :min AND :max) " +
-            "AND  ( p.name LIKE :search  " +
-            "OR p.description LIKE :search  )" )
+            "AND  ( p.name LIKE %:search%  " +
+            "OR p.description LIKE %:search%  )" )
     Page<Product> searchAllByService(@Param("search") String search, Pageable pageable , @Param("min") BigDecimal min, @Param("max") BigDecimal max);
 
 }

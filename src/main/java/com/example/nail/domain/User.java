@@ -21,6 +21,8 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private String userName;
+
     private String name;
 
     private String email;
@@ -30,6 +32,7 @@ public class User {
     private String password;
 
     private LocalDate dob;
+    private Boolean deleted;
 
     @Enumerated(value = EnumType.STRING)
     private ELock eLock;

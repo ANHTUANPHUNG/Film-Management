@@ -22,13 +22,13 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-//    @NotBlank(message = "Tên không được để trống")
-//    @Size(min = 8, max = 8, message = "Tên phải có đúng 8 ký tự!")
     private String name;
 
     private BigDecimal price;
 
     private String description;
+
+    private Boolean deleted;
 
     @ManyToOne
     @NotNull(message = "Not null")
@@ -39,5 +39,10 @@ public class Product {
 
     @OneToMany(mappedBy = "product")
     private List<ComboProduct> comboProducts;
+
+    public Product(Long id) {
+        this.id = id;
+    }
+
 
 }

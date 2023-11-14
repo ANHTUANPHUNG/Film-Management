@@ -3,7 +3,17 @@ const tBody = document.getElementById('tBody');
 const ePagination = document.getElementById('pagination')
 const eSearch = document.getElementById('search')
 const ePriceRange = document.getElementById('priceRange');
-const ePrice = document.getElementById('price-check')
+const ePrice = document.getElementById('price-check');
+const nameInput = document.getElementById("name");
+const descriptionInput = document.getElementById("description");
+const priceInput = document.getElementById("price");
+const posterInput = document.getElementById("post");
+const nameError = document.getElementById("nameError");
+const descriptionError = document.getElementById("descriptionError");
+const priceError = document.getElementById("priceError");
+const posterError = document.getElementById("posterError");
+const saveButton = document.getElementById("save");
+
 let products = [];
 let productSelected = {};
 let idImages = [];
@@ -12,7 +22,7 @@ let idPoster = [];
 
 let pageable = {
     page: 1,
-    sort: 'id,desc',
+    sortService: 'id,desc',
     search: '',
     min: 1,
     max: 50000000000000,
@@ -23,7 +33,7 @@ window.onload = async () => {
 }
 
 async function getList() {
-    const response = await fetch(`/api/products?page=${pageable.page - 1 || 0}&sort=${pageable.sortCustom || 'id,desc'}&search=${pageable.search || ''}&min=${pageable.min || ''}&max=${pageable.max || ''}`);
+    const response = await fetch(`/api/products?page=${pageable.page - 1 || 0}&sort=${pageable.sortService || 'id,desc'}&search=${pageable.search || ''}&min=${pageable.min || ''}&max=${pageable.max || ''}`);
     const result = await response.json();
 
     pageable = {
@@ -110,10 +120,10 @@ function searchByPrice(min, max) {
 const onLoadSort = () => {
     ePrice.onclick = () => {
         let sort = 'price,desc'
-        if(pageable.sortCustom?.includes('price') &&  pageable.sortCustom?.includes('desc')){
+        if(pageable.sortService?.includes('price') &&  pageable.sortService?.includes('desc')){
             sort = 'price,asc';
         }
-        pageable.sortCustom = sort;
+        pageable.sortService = sort;
         getList();
     }
 }
@@ -125,17 +135,9 @@ function getDataFromProduct(form) {
 
 // xử lí khi nhấn submit
 productForm.onsubmit = async (e) => {
-    const nameInput = document.getElementById("name");
-    const descriptionInput = document.getElementById("description");
-    const priceInput = document.getElementById("price");
-    const posterInput = document.getElementById("post");
-    const imagesInput = document.getElementById("file");
+    const areaError = $('.area-error');
+    areaError.empty();
 
-    const nameError = document.getElementById("nameError");
-    const descriptionError = document.getElementById("descriptionError");
-    const priceError = document.getElementById("priceError");
-    const posterError = document.getElementById("posterError");
-    const imagesError = document.getElementById("imagesError");
     let hasError = false;
 
     if (nameInput.value.trim() === "") {
@@ -197,13 +199,12 @@ productForm.onsubmit = async (e) => {
     } else {
         await createProduct(data)
     }
-    renderTable();
-    $('#staticBackdrop').modal('hide');
+    // await renderTable();
 }
 
 async function renderTable() {
 
-    const result = await (await fetch(`/api/products?page=${pageable.page - 1 || 0}&sort=${pageable.sortCustom || 'id,desc'}&search=${pageable.search || ''}&min=${pageable.min || ''}&max=${pageable.max || ''}`)).json()
+    const result = await (await fetch(`/api/products?page=${pageable.page - 1 || 0}&sort=${pageable.sortService || 'id,desc'}&search=${pageable.search || ''}&min=${pageable.min || ''}&max=${pageable.max || ''}`)).json()
     products = result.content;
     renderTBody(products);
 }
@@ -227,20 +228,22 @@ async function createProduct(data) {
         body: JSON.stringify(data)
     });
     if (response.ok) {
+        $('#staticBackdrop').modal('hide');
+
         Swal.fire({
             title: 'Đang xử lý',
             text: 'Vui lòng chờ...',
-            onBeforeOpen: () => {
+            willOpen: () => {
                 Swal.showLoading();
             },
             timer: 2000, // Đợi 2 giây (2000ms)
             showCancelButton: false,
             showConfirmButton: false,
             allowOutsideClick: false
-        }).then((result) => {
+        }).then(async (result) =>  {
             if (result.dismiss === Swal.DismissReason.timer) {
                 // Sau khi đợi 2 giây, hiển thị thông báo thành công
-                Swal.fire({
+              await  Swal.fire({
                     title: 'Created',
                     text: 'Tạo thành công.',
                     icon: 'success',
@@ -248,24 +251,38 @@ async function createProduct(data) {
                     position: 'top-start',
                     timer: 1500 // Hiển thị thông báo thành công trong 1,5 giây (1500ms)
                 });
+               renderTable();
+
             }
         });
     } else {
-        const errorData = await response.json();
-        let errorMessage = '';
-
-        for (const key in errorData) {
-            if (errorData.hasOwnProperty(key)) {
-                errorMessage += `${key}: ${errorData[key]}\n`;
+        const responseJSON = await response.json();
+        if (responseJSON) {
+            const errorFullNameElement = document.getElementById("nameError");
+            if ("name" in responseJSON) {
+                errorFullNameElement.style.display = "block";
+                errorFullNameElement.innerText = responseJSON.name;
+                errorFullNameElement.style.color= "red"
+            }
+            const errorEmailElement = document.getElementById("descriptionError");
+            if ("description" in responseJSON) {
+                errorEmailElement.style.display = "block";
+                errorEmailElement.innerText = responseJSON.description;
+                errorEmailElement.style.color= "red"
+            }
+            const errorAddressElement = document.getElementById("priceError");
+            if ("price" in responseJSON) {
+                errorAddressElement.style.display = "block";
+                errorAddressElement.innerText = responseJSON.price;
+                errorAddressElement.style.color= "red"
+            }
+            const errorPosterElement = document.getElementById("posterError");
+            if ("poster" in responseJSON) {
+                errorPosterElement.style.display = "block";
+                errorPosterElement.innerText = responseJSON.poster;
+                errorPosterElement.style.color= "red"
             }
         }
-
-        Swal.fire({
-            title: 'Error',
-            text: errorMessage,
-            icon: 'error',
-            confirmButtonText: 'OK'
-        });
     }
 }
 
@@ -347,20 +364,23 @@ async function  editProduct (data){
         },
         body: JSON.stringify(data)
     });
+
     if (response.ok) {
+        $('#staticBackdrop').modal('hide');
+
         Swal.fire({
             title: 'Đang xử lý',
             text: 'Vui lòng chờ...',
-            onBeforeOpen: () => {
+            willOpen: () => {
                 Swal.showLoading();
             },
             timer: 2000, // Đợi 2 giây (2000ms)
             showCancelButton: false,
             showConfirmButton: false,
             allowOutsideClick: false
-        }).then((result) => {
+        }).then( async (result) => {
             if (result.dismiss === Swal.DismissReason.timer) {
-                Swal.fire({
+               await Swal.fire({
                     title: 'Edited',
                     text: 'Sửa thành công.',
                     icon: 'success',
@@ -369,24 +389,34 @@ async function  editProduct (data){
                     timer: 900
 
                 })
+               await renderTable()
+
             }
         })
     } else {
-        const errorData = await response.json();
-        let errorMessage = '';
-
-        for (const key in errorData) {
-            if (errorData.hasOwnProperty(key)) {
-                errorMessage += `${key}: ${errorData[key]}\n`;
+        const responseJSON = await response.json();
+        if (responseJSON) {
+            console.log(responseJSON)
+            const errorFullNameElement = document.getElementById("nameError");
+            if ("name" in responseJSON) {
+                errorFullNameElement.style.display = "block";
+                errorFullNameElement.innerText = responseJSON.name;
+                errorFullNameElement.style.color= "red"
             }
-        }
+            const errorEmailElement = document.getElementById("priceError");
+            if ("price" in responseJSON) {
+                errorEmailElement.style.display = "block";
+                errorEmailElement.innerText = responseJSON.price;
+                errorEmailElement.style.color= "red"
+            }
+            const errorAddressElement = document.getElementById("descriptionError");
+            if ("description" in responseJSON) {
+                errorAddressElement.style.display = "block";
+                errorAddressElement.innerText = responseJSON.description;
+                errorAddressElement.style.color= "red"
+            }
 
-        Swal.fire({
-            title: 'Error',
-            text: errorMessage,
-            icon: 'error',
-            confirmButtonText: 'OK'
-        });
+        }
     }
 }
 async function deleteItem(itemId) {
@@ -411,7 +441,7 @@ async function deleteItem(itemId) {
         Swal.fire({
             title: 'Đang xử lý',
             text: 'Vui lòng chờ...',
-            onBeforeOpen: () => {
+            willOpen: () => {
                 Swal.showLoading();
             },
             timer: 2000, // Đợi 2 giây (2000ms)
@@ -444,6 +474,9 @@ async function deleteItem(itemId) {
 }
 
 function clearForm() {
+    const areaError = $('.areaError')
+    areaError.empty();
+
     idImages = [];
     idPoster = [];
     document.getElementById('name').value = '';
@@ -635,9 +668,9 @@ async function previewPoster(evt) {
         return;
     }
     idPoster = [];
-    document.getElementById("posterError").textContent='';
+    posterError.textContent='';
 
-    document.getElementById("save").disabled = true;
+    saveButton.disabled = true;
 
     const imgPost = document.getElementById("poster");
     const imageOld1 = imgPost.querySelectorAll('img');
@@ -673,7 +706,7 @@ async function previewPoster(evt) {
             }
         }
     }
-    document.getElementById("save").disabled = false;
+    saveButton.disabled = false;
 
 }
 
@@ -703,19 +736,16 @@ document.getElementById("menu-service").classList.add("active");
 
 function validateName(inputField) {
     const nameValue = inputField.value;
-    const nameError = document.getElementById("nameError");
-    const saveButton = document.getElementById("save");
-    const name = document.getElementById("name");
     const vietnameseWithDiacriticsAndLetterRegex = /^[A-Za-zÀ-ỹ\s]*[A-Za-zÀ-ỹ]+[A-Za-zÀ-ỹ\s]*$/;
     if (!vietnameseWithDiacriticsAndLetterRegex.test(nameValue)) {
         nameError.textContent = "Tên sản phẩm phải chứa ít nhất một chữ cái và không được có số.";
-        name.style.border= "1px solid red"
+        nameInput.style.border= "1px solid red"
         nameError.style.fontSize = "14px";
         saveButton.disabled = true;
         saveButton.style.opacity = 0.5;
     } else {
         nameError.textContent = '';
-        name.style.border= "1px solid #d9dee3"
+        nameInput.style.border= "1px solid #d9dee3"
 
         saveButton.disabled = false;
         saveButton.style.opacity = 1;
@@ -725,9 +755,6 @@ function validateName(inputField) {
 
 function validateDescription(inputField) {
     const descriptionValue = inputField.value;
-    const descriptionError = document.getElementById("descriptionError");
-    const saveButton = document.getElementById("save");
-    const description = document.getElementById("description");
 
     const validDescriptionRegex = /^[^\d]*[A-Za-zÀ-ỹ][^\d]*$/;
 
@@ -736,12 +763,12 @@ function validateDescription(inputField) {
         descriptionError.style.fontSize = "14px"; // Điều chỉnh font size ở đây (ví dụ: 14px)
         saveButton.disabled = true;
         saveButton.style.opacity = 0.5;
-        description.style.border= "1px solid red"
+        descriptionInput.style.border= "1px solid red"
     } else {
         descriptionError.textContent = '';
         saveButton.disabled = false;
         saveButton.style.opacity = 1;
-        description.style.border= "1px solid #d9dee3"
+        descriptionInput.style.border= "1px solid #d9dee3"
 
     }
 }
@@ -749,9 +776,6 @@ function validateDescription(inputField) {
 
 function validatePrice(inputField) {
     const priceValue = inputField.value;
-    const priceError = document.getElementById("priceError");
-    const saveButton = document.getElementById("save");
-    const price = document.getElementById("price");
 
     // Kiểm tra xem giá trị có phải là một số hợp lệ và nằm trong khoảng từ 10.000 đến 1.000.000 hay không
     const isValidPrice = !isNaN(priceValue) && parseFloat(priceValue) >= 10000 && parseFloat(priceValue) <= 1000000;
@@ -761,13 +785,13 @@ function validatePrice(inputField) {
         priceError.style.fontSize = "14px"; // Điều chỉnh font size ở đây (ví dụ: 14px)
         saveButton.disabled = true;
         saveButton.style.opacity = 0.5;
-        price.style.border= "1px solid red"
+        priceInput.style.border= "1px solid red"
 
     } else {
         priceError.textContent = ''; // Xóa thông báo lỗi nếu giá trị hợp lệ
         saveButton.disabled = false;
         saveButton.style.opacity = 1;
-        price.style.border= "1px solid #d9dee3"
+        priceInput.style.border= "1px solid #d9dee3"
 
     }
 }

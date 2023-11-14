@@ -22,4 +22,8 @@ public class ComboProduct {
 
     @ManyToOne
     private Combo combo;
+    public ComboProduct(Combo combo, Product product){
+        this.combo=combo;
+        this.product=product;
+    }
 }

@@ -1,6 +1,5 @@
-package com.example.nail.service.product.response;
+package com.example.nail.service.combo.response;
 
-import com.example.nail.service.file.FileResponse;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -9,11 +8,15 @@ import java.util.List;
 
 @Data
 @NoArgsConstructor
-public class ProductEditResponse {
+public class ComboEditResponse {
     private Long id;
+
     private String name;
+
     private String description;
+
     private BigDecimal price;
+    private List<Long> productsId;
     private String poster;
     private String idPoster;
     private List<String> images;

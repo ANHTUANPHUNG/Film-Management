@@ -34,6 +34,7 @@ public class ProductService {
 
     public ResponseEntity<?> createProduct(ProductSaveRequest request){
         var product = AppUtil.mapper.map(request, Product.class);
+        product.setDeleted(false);
         productRepository.save(product);
         var images = fileRepository.findAllById(request.getImages().stream().map(SelectOptionRequest::getId).collect(Collectors.toList()));
         for (var image: images) {
@@ -44,7 +45,6 @@ public class ProductService {
 
     }
     public Page<ProductListResponse> showListProduct(String search, Pageable pageable, BigDecimal min, BigDecimal max){
-        search = "%" + search + "%";
 
         return productRepository.searchAllByService(search,pageable,min,max)
                 .map(product -> ProductListResponse.builder()
@@ -60,7 +60,8 @@ public class ProductService {
     public void deleteById(Long id) {
         Product product = findById(id);
         fileRepository.deleteAllByProductId(id);
-        productRepository.delete(product);
+        product.setDeleted(true);
+        productRepository.save(product);
     }
     public Product findById(Long id) {
         //de tai su dung
@@ -69,8 +70,7 @@ public class ProductService {
                         (String.format(AppMessage.ID_NOT_FOUND, "Product", id)));
     }
     public ProductEditResponse findByIdProduct(Long id) {
-        var product = productRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException
-                (String.format(AppMessage.ID_NOT_FOUND, "User", id)));
+        var product = findById(id);
         var result = AppUtil.mapper.map(product, ProductEditResponse.class);
         result.setPoster(product.getPoster().getFileUrl());
         result.setIdPoster(product.getPoster().getId());

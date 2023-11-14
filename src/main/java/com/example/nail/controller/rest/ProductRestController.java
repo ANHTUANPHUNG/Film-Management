@@ -43,7 +43,7 @@ public class ProductRestController {
         return new ResponseEntity<>(productService.showListProduct(search,pageable, min,max), HttpStatus.OK);
     }
     @DeleteMapping("/{Id}")
-    public ResponseEntity<String> deleteRoom(@PathVariable Long Id) {
+    public ResponseEntity<String> deleteProduct(@PathVariable Long Id) {
         productService.deleteById(Id);
         return ResponseEntity.ok("Product deleted successfully");
     }

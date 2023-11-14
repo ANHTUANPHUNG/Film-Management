@@ -69,7 +69,7 @@
   }
 </style>
 <div class="container">
-  <div style="border-radius: 37px; background-color: white">    <h1 class="card-header" style="text-align: center">Nail Service</h1>
+  <div style="border-radius: 37px; background-color: white">    <h1 class="card-header" style="text-align: center">Nail Package</h1>
   </div>
   <br>
   <!-- Modal -->
@@ -82,31 +82,42 @@
           <!--                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" id="color"></button>-->
         </div>
         <div class="modal-body">
-          <form id="productForm"  >
+          <form id="packageForm"  >
             <div class="form-group col-12" >
               <label for="name">Name:</label>
-              <input style="border: 1px solid #aaa;" type="text" class="form-control" id="name" name="name" placeholder="Họ và tên"  oninput="validateName(this)" >
-              <label for="name"  id="nameError" class="error-message" style="color: red;"></label>
+              <input type="text" class="form-control" id="name" name="name" placeholder="Họ và tên"  oninput="validateName(this)" >
+              <div id="nameError" class="error-message" style="color: red;"></div>
             </div>
             <div class="form-group col-12">
               <label for="description">Description</label>
-              <input style="border: 1px solid #aaa;" type="text" class="form-control" id="description" placeholder="Mô tả sản phẩm" name="description" oninput="validateDescription(this)" >
-              <label for="description" id="descriptionError" class="error-message" style="color: red;"></label>
+              <input type="text" class="form-control" id="description" placeholder="Mô tả sản phẩm" name="description" oninput="validateDescription(this)" >
+              <div id="descriptionError" class="error-message" style="color: red;"></div>
 
             </div>
             <div class="form-group col-lg-12">
               <label for="price">Price</label>
-              <input style="border: 1px solid #aaa;" type="text" class="form-control" id="price" placeholder="Gía tiền"  name="price" oninput="validatePrice(this)" >
-              <label for="price" id="priceError" class="error-message" style="color: red;"></label>
+              <input type="text" class="form-control" id="price" placeholder="Gía tiền"  name="price" oninput="validatePrice(this)" >
+              <div id="priceError" class="error-message" style="color: red;"></div>
             </div>
+            <div class="form-group col-12">
+              <label for="products">Products</label>
+              <select style="width: 100%!important; padding: .375rem .75rem!important;"
+                      class="js-example-basic-multiple form-control" id="products" name="products"
+                      multiple="multiple">
+                <option th:each="product : ${products}" th:value="${product.value}"
+                        th:text="${product.name}"/>
+              </select>
+              <label for="products" id="productsError" class="error-message" style="color: red;"></label>
 
+            </div>
             <div>
               <div>Poster:</div>
               <div>
                 <label id="poster" for="post" >
                   <i id="uploadIcon" class="fas fa-upload" style="font-size: 95px;"></i>
                 </label>
-                <label for="post" id="posterError" class="error-message" style="color: red;"></label>
+                <div id="posterError" class="error-message" style="color: red;"></div>
+
                 <input id="post" class="d-none" type="file" accept="image/*"   onchange="previewPoster(event)">
               </div>
 
@@ -155,7 +166,7 @@
     <div style="display: flex ; justify-content: space-evenly">
       <div style="width: 20%;height: 65px">
         <button style="background-color: #ea9797; margin: 12px; color: beige" type="button" class="btn   " data-bs-toggle="modal" data-bs-target="#staticBackdrop" id="create">
-          Create Service
+          Create Package
         </button>
       </div>
       <nav
@@ -203,13 +214,14 @@
         <th style="width: 30px">No</th>
         <th style="width: 150px">Name</th>
         <th style="width: 150px">Description</th>
+        <th style="width: 150px">Products</th>
         <th id="price-check" class="arrow arrow-up" style="width: 100px">
           <span >Price &#9660;</span>
         </th>
         <th >Poster</th>
         <th >Action</th>
       </tr>
-      <tbody id="tBody">
+      <tbody id="tBodyPackage">
       </tbody>
     </table>
     <div class="d-flex justify-content-end">
@@ -223,7 +235,7 @@
 </div>
 
 <th:block th:replace="~{layout.html :: footer}"></th:block>
-<script src="/myjs/product.js"></script>
+<script src="/myjs/combo.js"></script>
 <script>
 
 

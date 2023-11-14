@@ -1,5 +1,6 @@
 package com.example.nail.controller;
 
+import com.example.nail.service.product.ProductService;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.boot.web.servlet.error.ErrorController;
@@ -11,7 +12,8 @@ import org.springframework.web.servlet.ModelAndView;
 @Controller
 @AllArgsConstructor
 @RequestMapping(value="/")
-public class HomeController implements ErrorController {
+public class HomeController  {
+    private ProductService productService;
     @GetMapping("/dashboard")
     public ModelAndView dashboard(){
         return new ModelAndView("/dashboard");
@@ -19,5 +21,15 @@ public class HomeController implements ErrorController {
     @GetMapping("/product")
     private ModelAndView product(){
         return new ModelAndView("/product");
+    }
+    @GetMapping("/combo")
+    private ModelAndView combo(){
+        ModelAndView view = new ModelAndView("/combo");
+        view.addObject("products", productService.findAll());
+        return view;
+    }
+    @GetMapping("/user")
+    private ModelAndView user(){
+        return new ModelAndView("/user");
     }
 }

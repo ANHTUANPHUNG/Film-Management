@@ -20,7 +20,7 @@ public class Combo {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String combo;
+    private String name;
 
     private BigDecimal price;
 
@@ -28,6 +28,7 @@ public class Combo {
 
     @ManyToOne
     private File posterCombo;
+    private Boolean deleted;
 
     @OneToMany(mappedBy = "combo")
     private List<File> imageCombo;

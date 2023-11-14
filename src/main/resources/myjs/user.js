@@ -1,427 +1,104 @@
+var eMenubar = document.getElementsByClassName("menu-item");
 const userForm = document.getElementById('userForm');
-const tBody = document.getElementById('tBody');
-const ePagination = document.getElementById('pagination')
+const tBodyUser = document.getElementById("tBodyUser")
 const eSearch = document.getElementById('search')
-const eHeaderPublishDate = document.getElementById('header-publish-date')
-const formBody = document.getElementById('formBody');
-const avatarDefault = document.createElement('img');
+const nameInput = document.getElementById("name");
+const userNameInput = document.getElementById("userName");
+const passwordInput = document.getElementById("password");
+const emailInput = document.getElementById("email");
+const phoneInput = document.getElementById("phone");
+const dobInput = document.getElementById("dob");
+const posterInput = document.getElementById("post");
+const userNameError = document.getElementById("userNameError");
+const passwordError = document.getElementById("passwordError");
+const emailError = document.getElementById("emailError");
+const phoneError = document.getElementById("phoneError");
+const dobError = document.getElementById("dobError");
+const nameError = document.getElementById("nameError");
+const posterError = document.getElementById("posterError");
+const saveButton = document.getElementById("save");
+const ePagination = document.getElementById('pagination')
 
-let rooms = [];
+let users = [];
 let userSelected = {};
-let pageable = {
-    page: 1,
-    sort: 'id,desc',
-
+let idPoster = [];
+for (var i = 0; i < eMenubar.length; i++) {
+    eMenubar[i].classList.remove("active");
 }
-
-userForm.onsubmit = async (e) => {
-    e.preventDefault();
-    let data = getDataFromForm(userForm);
-
-    data = {
-        ...data,
-        avatar: {id: idImages[0]}
-
-    }
-    if (userSelected.id) {
-        await editRoom(data);
-    } else {
-        await createRoom(data)
-    }
-    renderTable();
-    $('#staticBackdrop').modal('hide');
-}
-
-async function renderTable() {
-    const pageable = await getRooms();
-    rooms = pageable.content;
-    renderTBody(rooms);
-    addEventEditAndDelete();
-}
-async function getRooms() {
-    const res = await fetch('/api/users');
-    return await res.json();
-}
-const addEventEditAndDelete = () => {
-    const eEdits = tBody.querySelectorAll('.edit');
-    const eDeletes = tBody.querySelectorAll('.delete');
-    for (let i = 0; i < eEdits.length; i++) {
-        console.log(eEdits[i].id)
-        eEdits[i].addEventListener('click', () => {
-            onShowEdit(eEdits[i].dataset.id);
-        })
-    }
-}
-
-const password1 = document.getElementById('password');
-const confirmPassword = document.getElementById('confirmPassword');
-const oldPassword = document.getElementById('oldPassword');
-
-async function editRoom(data) {
-    if (password1.value !== confirmPassword.value) {
-        Swal.fire({
-            title: 'Error',
-            text: 'Mật khẩu xác nhận không khớp.',
-            icon: 'error',
-            confirmButtonText: 'OK'
-        });
-        return;
-    }
-    if (oldPassword.value !== userSelected.passWord) {
-        console.log(oldPassword.value)
-        console.log(data.passWord)
-
-        Swal.fire({
-            title: 'Error',
-            text: 'Mật khẩu cũ không khớp.',
-            icon: 'error',
-            confirmButtonText: 'OK'
-        });
-        return;
-    }
-
-
-    const response = await fetch('/api/users/' + data.id, {
-        method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(data)
-    });
-
-    if (response.ok) {
-        Swal.fire({
-            title: 'Edited',
-            text: 'Phòng đã được chỉnh sửa thành công.',
-            icon: 'success',
-            confirmButtonText: 'OK'
-        }).then(() => {
-            location.reload(); // Tải lại trang sau khi chỉnh sửa phòng
-        });
-    } else {
-        Swal.fire({
-            title: 'Error',
-            text: 'Có lỗi xảy ra khi chỉnh sửa phòng.',
-            icon: 'error',
-            confirmButtonText: 'OK'
-        });
-    }
-}
-
-async function createRoom(data) {
-    // console.log("cuatoi"+data)
-    // if (data.fire().status.ok) {
-    //     Swal.fire({
-    //         title: 'Created',
-    //         text: 'Phòng đã được tạo thành công.',
-    //         icon: 'success',
-    //         confirmButtonText: 'OK'
-    //     }).then(() => {
-    //         getList();
-    //     });
-    // }
-    const response = await fetch('/api/users', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(data)
-    });
-    if (response.ok) {
-        Swal.fire({
-            title: 'Created',
-            text: 'Phòng đã được tạo thành công.',
-            icon: 'success',
-            confirmButtonText: 'OK'
-        }).then(() => {
-            getList();
-        });
-    } else {
-        Swal.fire({
-            title: 'Error',
-            text: 'Có lỗi xảy ra khi tạo phòng.',
-            icon: 'error',
-            confirmButtonText: 'OK'
-        });
-    }
-
-}
-let isEditing = false;
-
-const onShowCreate = () => {
-
-    clearForm();
-    if (!isEditing) {
-        $('#oldPassword').hide();
-        $('#confirmPassword').hide();
-        $('#oldPasswordLabel').hide();
-        $('#confirmPasswordLabel').hide();
-    }
-    $('#staticBackdropLabel').text('Create User');
-    renderForm(formBody, getDataInput());
-}
-
-document.getElementById('create').onclick = () => {
-    onShowCreate();
-}
-
-const findById = async (id) => {
-    const response = await fetch('/api/users/' + id);
-    const user = await response.json();
-    console.log('Data from API:', user);
-
-    if (user.passWord) {
-        userSelected.passWord = user.passWord;
-    }
-
-    return user;
-}
-const onShowEdit = async (id) => {
-    clearForm();
-    userSelected = await findById(id);
-    avatarDefault.src = userSelected.avatar;
-    $('#staticBackdropLabel').text('Edit User');
-    $('#staticBackdrop').modal('show');
-    $('#name').val(userSelected.name);
-    $('#email').val(userSelected.email);
-    $('#phone').val(userSelected.phone);
-    $('#dob').val(userSelected.dob);
-    $('#statusCustomer').val(userSelected.statusCustomer);
-    $('#passWord').val(userSelected.passWord);
-
-    console.log('isEditing', isEditing)
-    if (!isEditing) {
-        $('#oldPassword').show();
-        $('#confirmPassword').show();
-        $('#oldPasswordLabel').show();
-        $('#confirmPasswordLabel').show();
-    }
-
-    renderForm(formBody, getDataInput());
-}
-
-
-
-
-function getDataFromForm(form) {
-    const data = new FormData(form);
-    const password = document.getElementById('password').value;
-
-    data.append('passWord', password);
-    if (userSelected.id) {
-        data.append('id', userSelected.id);
-    }
-    return Object.fromEntries(data.entries());
-}
-function renderItemStr(item) {
-    let lockSelected = item.lock === 'LOCK' ? 'selected' : '';
-    let unlockSelected = item.lock === 'UNLOCK' ? 'selected' : '';
-
-    return `<tr>
-        <td>
-            ${item.id}
-        </td>
-        <td>
-            ${item.name}
-        </td>
-        <td>
-            ${item.email}
-        </td>
-        <td>
-            ${item.phone}
-        </td>
-        <td>
-            ${item.dob}
-        </td>
-        <td >
-           <img class="avatar-away" src="${item.avatar}" alt=""> 
-        </td>
-        <td>
-            ${item.statusCustomer}
-        </td>
-        <td>
-            <select id="lock-${item.id}" class="satus btn btn-danger" onchange="onChangeSelect(${item.id}, this.value)">
-                <option value="LOCK" ${lockSelected} class="LOCK">Lock</option>
-                <option value="UNLOCK" ${unlockSelected} class="UNLOCK">Unlock</option>
-            </select>
-        </td>
-        <td>
-            <a class="btn edit" data-id="${item.id}" onclick="onShowEdit(${item.id})">
-                <i class="fa-regular fa-pen-to-square text-primary"></i>
-            </a>
-            <a class="btn delete" data-id="${item.id}" onclick="deleteItem(${item.id})">
-                <i class="fa-regular fa-trash-can text-danger"></i>
-            </a> 
-        </td>
-    </tr>`;
-}
-function onChangeSelect(id, selectedValue) {
-    const confirmation = window.confirm(`Bạn có chắc chắn muốn thay đổi trạng thái thành '${selectedValue}' không?`);
-
-    if (confirmation) {
-        fetch(`/api/users/${id}/${selectedValue}`, {
-            method: 'GET',
-        })
-            .then(response => {
-                if (response.ok) {
-                    console.log('Lock status changed successfully');
-                } else {
-                    console.error('Error changing lock status');
-                }
-            })
-            .catch(error => {
-                console.error('An error occurred:', error);
-            });
-    } else {
-        console.log('Cancelled');
-    }
-}
-function getDataInput() {
-    return [
-        {
-            label: 'Name',
-            name: 'name',
-            value: userSelected.name,
-            required: true,
-            pattern: "^[A-Za-z ]{6,20}",
-            message: "Username must have minimum is 6 characters and maximum is 20 characters",
-        },
-        {
-            label: 'Email',
-            name: 'email',
-            value: userSelected.email,
-            // pattern: "^[A-Za-z ]{6,120}",
-            message: "Description must have minimum is 6 characters and maximum is 20 characters",
-            required: true
-        },
-        {
-            label: 'Phone',
-            name: 'phone',
-            value: userSelected.phone,
-            // pattern: "[1-9][0-9]{1,10}",
-            // message: 'Price errors',
-            // pattern: "[0-9]{10}",
-            message: 'Phone errors',
-            required: true
-        },
-        {
-            label: 'Date of birth',
-            name: 'dob',
-            value: userSelected.dob,
-            type: 'date',
-            required: true
-        },
-        {
-            label: "Type",
-            name: "statusCustomer",
-            value: userSelected.statusCustomer,
-            type: "select",
-            require: true,
-            message: "Type invalid",
-            options: [{value: "SILVER", name:"Silver"},{value: "GOLD", name:"Gold"},{value: "PREMIUM", name:"Premium"}],
-        },
-    ];
-}
-
-async function getList() {
-    const response = await fetch(`/api/users?page=${pageable.page - 1 || 0}&sort=${pageable.sortCustom || 'id,desc'}&search=${pageable.search || ''}`);
-    const result = await response.json();
-    pageable = {
-        ...pageable,
-        ...result
-    };
-    genderPagination();
-
-    console.log(result)
-    renderTBody(result.content);
-}
-
 
 window.onload = async () => {
-
     await getList();
-    onLoadSort();
-    renderForm(formBody, getDataInput());
-
 }
-function renderTBody(items) {
-    let str = '';
-    if (Array.isArray(items)) {
-        items.forEach(e => {
-            str += renderItemStr(e);
-        });
-    }
-    tBody.innerHTML = str;
+document.getElementById("menu-user").classList.add("active");
+let pageable ={
+    page: 1,
+    search: "",
+    sortUser: "id,desc"
 }
+async function getList(){
+    const result = await (await fetch(`/api/users?page=${pageable.page - 1 || 0}&sort=${pageable.sortUser}&search=${pageable.search || ''}`)).json()
 
-async function deleteItem(itemId) {
-    const { isConfirmed } = await Swal.fire({
-        title: 'Xác nhận xóa',
-        text: 'Bạn có chắc chắn muốn xóa mục này?',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonText: 'Xóa',
-        cancelButtonText: 'Hủy',
-    });
-
-    if (!isConfirmed) {
-        return; // Người dùng đã hủy xóa
-    }
-
-    const response = await fetch(`/api/users/${itemId}`, {
-        method: 'DELETE',
-    });
-
-    if (response.ok) {
-        Swal.fire('Xóa thành công', '', 'success');
-        await getList();
-    } else {
-        Swal.fire('Xóa không thành công', '', 'error');
-    }
+    genderPagination();
+    renderTBody(result.content);
 }
-
 const genderPagination = () => {
     ePagination.innerHTML = '';
     let str = '';
-    //generate preview truoc
+
+    // Xác định khoảng trang cần hiển thị (ví dụ: 5 trang xung quanh trang hiện tại)
+    const maxPagesToShow = 5;
+    const pagesToLeft = Math.floor(maxPagesToShow / 2);
+    const pagesToRight = maxPagesToShow - pagesToLeft;
+
+    // Tính toán trang đầu và trang cuối cần hiển thị
+    let startPage = pageable.page - pagesToLeft;
+    if (startPage < 1) {
+        startPage = 1;
+    }
+    let endPage = startPage + maxPagesToShow - 1;
+    if (endPage > pageable.totalPages) {
+        endPage = pageable.totalPages;
+    }
+
+    // Generate "Previous" button
     str += `<li class="page-item ${pageable.first ? 'disabled' : ''}">
               <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
             </li>`
-    //generate 1234
 
-    for (let i = 1; i <= pageable.totalPages; i++) {
-        str += ` <li class="page-item ${(pageable.page) === i ? 'active' : ''}" aria-current="page">
-      <a class="page-link" href="#">${i}</a>
-    </li>`
+    // Generate page numbers
+    for (let i = startPage; i <= endPage; i++) {
+        str += `<li class="page-item ${(pageable.page) === i ? 'active' : ''}" aria-current="page">
+                    <a class="page-link" href="#">${i}</a>
+                </li>`
     }
-    //
-    //generate next truoc
+
+    // Generate "Next" button
     str += `<li class="page-item ${pageable.last ? 'disabled' : ''}">
               <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Next</a>
             </li>`
-    //generate 1234
+
     ePagination.innerHTML = str;
 
-    const ePages = ePagination.querySelectorAll('li'); // lấy hết li mà con của ePagination
+    const ePages = ePagination.querySelectorAll('li');
     const ePrevious = ePages[0];
-    const eNext = ePages[ePages.length-1]
+    const eNext = ePages[ePages.length - 1];
 
     ePrevious.onclick = () => {
-        if(pageable.page === 1){
+        if (pageable.page === 1) {
             return;
         }
         pageable.page -= 1;
         getList();
     }
     eNext.onclick = () => {
-        if(pageable.page === pageable.totalPages){
+        if (pageable.page === pageable.totalPages) {
             return;
         }
         pageable.page += 1;
         getList();
     }
     for (let i = 1; i < ePages.length - 1; i++) {
-        if(i === pageable.page){
+        if (i === pageable.page) {
             continue;
         }
         ePages[i].onclick = () => {
@@ -430,6 +107,381 @@ const genderPagination = () => {
         }
     }
 }
+function renderTBody(items) {
+    let str = '';
+    if (Array.isArray(items)) {
+
+        items.forEach(e => {
+            str += renderItemStr(e);
+        });
+    }
+    tBodyUser.innerHTML = str;
+}
+function renderItemStr(item) {
+    return `<tr>
+                    <td>
+                        ${item.id}
+                    </td>
+                    <td onmouseover="showTooltip(this)" data-id="${item.id}">
+                        ${item.userName}
+                    </td>
+                    
+                    <td>
+                        ${item.role}
+                    </td>
+                    <td>
+                        ${item.type}
+                    </td>
+                     <td>
+                        ${item.lock}
+                    </td>
+                   
+                    <td style="width: 120px;" >
+                        <a class="btn detail" data-id="${item.id}" onclick="onShowDetail(${item.id})" id ="detail" style="padding-left: 5px;height: 37px;    width: 47px;
+">
+                            <i class="fas fa-info-circle text-info"></i>
+                        </a>
+                        <a class="btn edit" data-id="${item.id}" onclick="onShowEdit(${item.id})" id="edit" style="padding: 0;     width: 21px;
+">
+                            <i class="fa-regular fa-pen-to-square text-primary"></i>
+                        </a>
+                         
+                    </td>
+                </tr>`
+}
+async function showTooltip(element) {
+    const userId = element.getAttribute("data-id");
+    const tooltipContent = await fetchUserData(userId);
+    const tooltipElement = document.createElement("div");
+    tooltipElement.innerHTML = tooltipContent;
+
+    // Set the position to the right of the hovered element
+    const rect = element.getBoundingClientRect();
+    tooltipElement.style.position = "fixed"; // Use fixed position for consistent placement
+    tooltipElement.style.top = "125px";
+    tooltipElement.style.left = rect.right + "px";
+    // tooltipElement.style.right = rect.right + "px";
+
+    document.body.appendChild(tooltipElement);
+
+    element.onmouseout = () => {
+        document.body.removeChild(tooltipElement);
+    };
+}
+
+
+async function fetchUserData(userId) {
+    const res = await fetch(`api/users/${userId}`);
+    const userData = await res.json();
+    console.log(userData.avatar)
+    return `<div style="background-color: wheat; display: flex; padding: 5px 30px; border: 1px solid #697a8d; border-radius: 5px;">
+                <div>
+                <p>Name: ${userData.name}</p>
+                <p>Email: ${userData.email}</p>
+                <p>Phone: ${userData.phone}</p>
+                <p>Date of Birth: ${userData.dob}</p>
+                <p>Avatar:</p>  
+                <div style="display: flex;justify-content: center">
+                                    <img  src="${userData.avatar}" alt="User Avatar" style="width: 100px; height: 100px; ">              
+                </div>
+                </div>
+            </div>`;
+}
+function getDataFromPackage(form) {
+    event.preventDefault()
+    const data = new FormData(form);
+    return Object.fromEntries(data.entries())
+}
+userForm.onsubmit = async (e) => {
+    const areaError = $('.area-error');
+    areaError.empty();
+
+    let hasError = false;
+
+    if (nameInput.value.trim() === "") {
+        nameError.textContent = "Tên là  bắt buộc.";
+        hasError = true;
+    } else {
+        nameError.textContent = ''; 
+    }
+    if (emailInput.value.trim() === "") {
+        emailError.textContent = "Email là  bắt buộc.";
+        hasError = true;
+    } else {
+        emailError.textContent = ''; 
+    }
+    if (phoneInput.value.trim() === "") {
+        phoneError.textContent = "Số điện thoại là  bắt buộc.";
+        hasError = true;
+    } else {
+        phoneError.textContent = ''; 
+    }
+    if (dobInput.value.trim() === "") {
+        dobError.textContent = "Ngày sinh là  bắt buộc.";
+        hasError = true;
+    } else {
+        dobError.textContent = ''; 
+    }
+    if (userNameInput.value.trim() === "") {
+        userNameError.textContent = "Tên đăng nhập là  bắt buộc.";
+        hasError = true;
+    } else {
+        userNameError.textContent = ''; 
+    }
+    if (passwordInput.value.trim() === "") {
+        passwordError.textContent = "Mật khẩu là  bắt buộc.";
+        hasError = true;
+    } else {
+        passwordError.textContent = '';
+    }
+    if(document.getElementById("staticBackdropLabel").innerText === "Create User"){
+        if ( posterInput.value.trim() === "") {
+            posterError.textContent = "Avatar là  bắt buộc.";
+            hasError = true;
+        } else {
+            posterError.textContent = '';
+        }
+    }
+
+    if (hasError){
+        e.preventDefault();
+        return;
+    }
+
+    let data = getDataFromPackage(userForm);
+
+
+    data = {
+        ...data,
+        id: userSelected.id,
+        avatar: { id: idPoster[0] },
+        
+    }
+    if (userSelected.id) {
+        await editProduct(data);
+    } else {
+        await createProduct(data)
+    }
+    // await renderTable();
+}
+
+async function renderTable() {
+
+    const result = await (await fetch(`/api/users?page=${pageable.page - 1 || 0}&sort=${pageable.sortCustom || 'id,desc'}&search=${pageable.search || ''}`)).json()
+    users = result.content;
+    renderTBody(users);
+}
+document.getElementById('create').onclick = () => {
+    onShowCreate();
+}
+const onShowCreate = () => {
+    document.getElementById('poster').innerHTML = ' <i id="uploadIcon" class="fas fa-upload" style="font-size: 95px;"></i>'
+    clearForm();
+    $('#staticBackdropLabel').text('Create User');
+
+}
+// create submit
+async function createProduct(data) {
+    const response = await fetch('/api/users', {
+
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    });
+    if (response.ok) {
+        $('#staticBackdrop').modal('hide');
+
+        Swal.fire({
+            title: 'Đang xử lý',
+            text: 'Vui lòng chờ...',
+            willOpen: () => {
+                Swal.showLoading();
+            },
+            timer: 2000, // Đợi 2 giây (2000ms)
+            showCancelButton: false,
+            showConfirmButton: false,
+            allowOutsideClick: false
+        }).then(async (result) =>  {
+            if (result.dismiss === Swal.DismissReason.timer) {
+                // Sau khi đợi 2 giây, hiển thị thông báo thành công
+                await  Swal.fire({
+                    title: 'Created',
+                    text: 'Tạo thành công.',
+                    icon: 'success',
+                    showConfirmButton: false,
+                    position: 'top-start',
+                    timer: 1500 // Hiển thị thông báo thành công trong 1,5 giây (1500ms)
+                });
+                renderTable();
+
+            }
+        });
+    } else {
+        const responseJSON = await response.json();
+        if (responseJSON) {
+            const errorFullNameElement = document.getElementById("nameError");
+            if ("name" in responseJSON) {
+                errorFullNameElement.style.display = "block";
+                errorFullNameElement.innerText = responseJSON.name;
+                errorFullNameElement.style.color= "red"
+            }
+            const errorEmailElement = document.getElementById("descriptionError");
+            if ("description" in responseJSON) {
+                errorEmailElement.style.display = "block";
+                errorEmailElement.innerText = responseJSON.description;
+                errorEmailElement.style.color= "red"
+            }
+            const productsErrorElement = document.getElementById("productsError");
+            if ("idProducts" in responseJSON) {
+                productsErrorElement.style.display = "block";
+                productsErrorElement.innerText = responseJSON.idProducts;
+                productsErrorElement.style.color= "red"
+            }
+            const errorAddressElement = document.getElementById("priceError");
+            if ("price" in responseJSON) {
+                errorAddressElement.style.display = "block";
+                errorAddressElement.innerText = responseJSON.price;
+                errorAddressElement.style.color= "red"
+            }
+            const errorPosterElement = document.getElementById("posterError");
+            if ("poster" in responseJSON) {
+                errorPosterElement.style.display = "block";
+                errorPosterElement.innerText = responseJSON.poster;
+                errorPosterElement.style.color= "red"
+            }
+        }
+    }
+}
+
+const findById = async (id) => {
+    const response = await fetch('/api/users/' + id);
+    return await response.json();
+}
+
+
+const onShowEdit = async (id) => {
+    clearForm();
+    userSelected = await findById(id);
+    console.log(userSelected)
+    const poster = document.getElementById("poster");
+    const img = document.createElement('img');
+    img.src = userSelected.avatar;
+    img.id = userSelected.idAvatar;
+    img.style.width='150px';
+    img.style.height='100px';
+    if(userSelected.avatar){
+        document.getElementById("uploadIcon").style.display="none";
+        poster.append(img)
+    }
+    $('#staticBackdropLabel').text('Edit User');
+    $('#staticBackdrop').modal('show');
+    $('#name').val(userSelected.name);
+    $('#password').val(userSelected.password);
+    $('#userName').val(userSelected.userName);
+    $('#email').val(userSelected.email);
+    $('#phone').val(userSelected.phone);
+    $('#dob').val(userSelected.dob);
+}
+
+
+// edit submit
+async function  editProduct (data){
+
+    const response = await fetch('/api/users/'+data.id, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    });
+
+    if (response.ok) {
+        $('#staticBackdrop').modal('hide');
+
+        Swal.fire({
+            title: 'Đang xử lý',
+            text: 'Vui lòng chờ...',
+            willOpen: () => {
+                Swal.showLoading();
+            },
+            timer: 2000, // Đợi 2 giây (2000ms)
+            showCancelButton: false,
+            showConfirmButton: false,
+            allowOutsideClick: false
+        }).then( async (result) => {
+            if (result.dismiss === Swal.DismissReason.timer) {
+                await Swal.fire({
+                    title: 'Edited',
+                    text: 'Sửa thành công.',
+                    icon: 'success',
+                    showConfirmButton: false,
+                    position: 'top-start',
+                    timer: 900
+
+                })
+                await renderTable()
+
+            }
+        })
+    } else {
+        const responseJSON = await response.json();
+        if (responseJSON) {
+            console.log(responseJSON)
+            const errorFullNameElement = document.getElementById("nameError");
+            if ("name" in responseJSON) {
+                errorFullNameElement.style.display = "block";
+                errorFullNameElement.innerText = responseJSON.name;
+                errorFullNameElement.style.color= "red"
+            }
+            const errorEmailElement = document.getElementById("priceError");
+            if ("price" in responseJSON) {
+                errorEmailElement.style.display = "block";
+                errorEmailElement.innerText = responseJSON.price;
+                errorEmailElement.style.color= "red"
+            }
+            const productsErrorElement = document.getElementById("productsError");
+            if ("idProducts" in responseJSON) {
+                productsErrorElement.style.display = "block";
+                productsErrorElement.innerText = responseJSON.idProducts;
+                productsErrorElement.style.color= "red"
+            }
+            const errorAddressElement = document.getElementById("descriptionError");
+            if ("description" in responseJSON) {
+                errorAddressElement.style.display = "block";
+                errorAddressElement.innerText = responseJSON.description;
+                errorAddressElement.style.color= "red"
+            }
+
+        }
+    }
+}
+
+function clearForm() {
+    const areaError = $('.areaError')
+    areaError.empty();
+
+    idPoster = [];
+    document.getElementById('name').value = '';
+    document.getElementById('nameError').innerText = '';
+    document.getElementById('posterError').innerText = '';
+    document.getElementById('dobError').innerText = '';
+    document.getElementById('phoneError').innerText = '';
+    document.getElementById('emailError').innerText = '';
+    document.getElementById('passwordError').innerText = '';
+    document.getElementById('userNameError').innerText = '';
+    document.getElementById('name').style.border = '1px solid #d9dee3';
+
+    const posterEle = document.getElementById("poster")
+    const posterChild = posterEle.querySelectorAll('img');
+    for (let i = 0; i < posterChild.length; i++) {
+        posterEle.removeChild(posterChild[i])
+    }
+    userForm.reset();
+    userSelected = {};
+}
+
 const onSearch = (e) => {
     e.preventDefault()
     pageable.search = eSearch.value;
@@ -442,61 +494,37 @@ const searchInput = document.querySelector('#search');
 searchInput.addEventListener('search', () => {
     onSearch(event)
 });
-const onLoadSort = () => {
-    eHeaderPublishDate.onclick = () => {
-        let sort = 'dob,desc'
-        if(pageable.sortCustom?.includes('dob') &&  pageable.sortCustom?.includes('desc')){
-            sort = 'dob,asc';
-        }
-        pageable.sortCustom = sort;
-        getList();
-    }
-}
-function clearForm() {
-    idImages = [];
-
-    const imgEle = document.getElementById("images");
-    const imageOld = imgEle.querySelectorAll('img');
-    for (let i = 0; i < imageOld.length; i++) {
-        imgEle.removeChild(imageOld[i])
-    }
-    avatarDefault.src = '../assets/img/avatars/default_avatar.png';
-    avatarDefault.classList.add('avatar-preview');
-    imgEle.append(avatarDefault)
-    userForm.reset();
-    userSelected = {};
-}
 
 
 
-let idImages = [];
 
-async function previewImage(evt) {
+
+
+async function previewPoster(evt) {
+
     if(evt.target.files.length === 0){
         return;
     }
-    idImages = [];
+    idPoster = [];
+    posterError.textContent='';
 
-    const imgEle = document.getElementById("images");
-    const imageOld = imgEle.querySelectorAll('img');
-    for (let i = 0; i < imageOld.length; i++) {
-        imgEle.removeChild(imageOld[i])
+    saveButton.disabled = true;
+
+    const imgPost = document.getElementById("poster");
+    const imageOld1 = imgPost.querySelectorAll('img');
+    for (let i = 0; i < imageOld1.length; i++) {
+        imgPost.removeChild(imageOld1[i])
     }
-
-    // When the image is loaded, update the img element's src
     const files = evt.target.files
     for (let i = 0; i < files.length; i++) {
         const file = files[i];
-        await previewImageFile(file, i);
-
+        await previewPosterFile(file, i);
         if (file) {
-            // Create a new FormData object and append the selected file
             const formData = new FormData();
-            formData.append("avatar", file);
+            formData.append("poster", file);
             formData.append("fileType", "image");
             try {
-                // Make a POST request to upload the image
-                const response = await fetch("/api/files", {
+                const response = await fetch("/api/files/posters", {
                     method: "POST",
                     body: formData,
                 });
@@ -504,34 +532,149 @@ async function previewImage(evt) {
                     const result = await response.json();
                     if (result) {
                         const id = result.id;
-                        idImages.push(id);
-                        document.getElementById("saveChange").disabled = false;
+                        idPoster.push(id);
                     } else {
                         console.error('Image ID not found in the response.');
                     }
                 } else {
-                    // Handle non-OK response (e.g., show an error message)
                     console.error('Failed to upload image:', response.statusText);
                 }
             } catch (error) {
-                // Handle network or other errors
                 console.error('An error occurred:', error);
             }
         }
     }
+    saveButton.disabled = false;
+
 }
 
-async function previewImageFile(file) {
+
+async function previewPosterFile(file) {
     const reader = new FileReader();
+
     reader.onload = function () {
-        const imgEle = document.getElementById("images");
+        const imgPost = document.getElementById("poster");
         const img = document.createElement('img');
-        img.src =reader.result;
-        img.classList.add('avatar-preview');
-        imgEle.append(img);
-
-
+        img.src = reader.result;
+        img.classList.add('avatar-previews');
+        imgPost.append(img);
+        const uploadIcon = document.getElementById('uploadIcon');
+        if (uploadIcon) {
+            uploadIcon.style.display = 'none';
+        }
     };
     reader.readAsDataURL(file);
-
 }
+
+
+function validateName(inputField) {
+    const nameValue = inputField.value;
+    const vietnameseWithDiacriticsAndLetterRegex = /^[A-Za-zÀ-ỹ\s]*[A-Za-zÀ-ỹ]+[A-Za-zÀ-ỹ\s]*$/;
+    if (!vietnameseWithDiacriticsAndLetterRegex.test(nameValue)) {
+        nameError.textContent = "Tên phải chứa ít nhất một chữ cái và không được có số.";
+        nameInput.style.border= "1px solid red"
+        nameError.style.fontSize = "14px";
+        saveButton.disabled = true;
+        saveButton.style.opacity = 0.5;
+    } else {
+        nameError.textContent = '';
+        nameInput.style.border= "1px solid #d9dee3"
+
+        saveButton.disabled = false;
+        saveButton.style.opacity = 1;
+
+    }
+}
+function validateUserName(inputField) {
+    const userNameValue = inputField.value;
+    const vietnameseWithDiacriticsAndLetterRegex = /^[A-Za-z0-9À-ỹ\s]*[A-Za-z0-9À-ỹ]+[A-Za-z0-9À-ỹ\s]*$/;
+    const isLengthValid = userNameValue.length >= 6;
+    if (!vietnameseWithDiacriticsAndLetterRegex.test(userNameValue) || !isLengthValid) {
+        userNameError.textContent = "Tên đăng nhập phải chứa ít nhất 6 ký tự và có thể có số.";
+        inputField.style.border = "1px solid red";
+        userNameError.style.fontSize = "14px";
+        saveButton.disabled = true;
+        saveButton.style.opacity = 0.5;
+    } else {
+        userNameError.textContent = '';
+        inputField.style.border = "1px solid #d9dee3";
+        saveButton.disabled = false;
+        saveButton.style.opacity = 1;
+    }
+}
+function validatePassword(inputField) {
+    const passwordValue = inputField.value;
+    const vietnameseWithDiacriticsAndLetterRegex = /^[A-Za-z0-9À-ỹ\s]*[A-Za-z0-9À-ỹ]+[A-Za-z0-9À-ỹ\s]*$/;
+    const isLengthValid = passwordValue.length >= 6;
+    if (!vietnameseWithDiacriticsAndLetterRegex.test(passwordValue) || !isLengthValid) {
+        passwordError.textContent = "Tên đăng nhập phải chứa ít nhất 6 ký tự và có thể có số.";
+        inputField.style.border = "1px solid red";
+        passwordError.style.fontSize = "14px";
+        saveButton.disabled = true;
+        saveButton.style.opacity = 0.5;
+    } else {
+        passwordError.textContent = '';
+        inputField.style.border = "1px solid #d9dee3";
+        saveButton.disabled = false;
+        saveButton.style.opacity = 1;
+    }
+}
+function validateEmail(inputField) {
+    const emailValue = inputField.value;
+    // Biểu thức chính xác kiểm tra email thuộc các tên miền cụ thể (gmail, yahoo, mailinator)
+    const emailRegex = /^(?=.*[@])(?=.*(gmail\.com|yahoo\.com|email\.com|mailinator\.com))(?!.*\.{2})[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+
+    if (!emailRegex.test(emailValue)) {
+        emailError.textContent = "Địa chỉ email không hợp lệ.";
+        inputField.style.border = "1px solid red";
+        emailError.style.fontSize = "14px";
+        saveButton.disabled = true;
+        saveButton.style.opacity = 0.5;
+    } else {
+        emailError.textContent = '';
+        inputField.style.border = "1px solid #d9dee3";
+        saveButton.disabled = false;
+        saveButton.style.opacity = 1;
+    }
+}
+function validateDob(inputField) {
+    const dobValue = inputField.value;
+    const dobError = document.getElementById("dobError");
+    // const saveButton = document.getElementById("save"); // Thay thế "saveButton" bằng ID của nút lưu của bạn.
+
+    if (calculateAge(dobValue) < 16) {
+        dobError.textContent = "Bạn phải đủ 16 tuổi trở lên.";
+        inputField.style.border = "1px solid red";
+        dobError.style.fontSize = "14px";
+        saveButton.disabled = true;
+        saveButton.style.opacity = 0.5;
+    } else {
+        dobError.textContent = '';
+        inputField.style.border = "1px solid #d9dee3";
+        saveButton.disabled = false;
+        saveButton.style.opacity = 1;
+    }
+}
+
+// Hàm tính tuổi dựa trên ngày sinh
+function calculateAge(dob) {
+    const dobDate = new Date(dob);
+    const currentDate = new Date();
+    const age = currentDate.getFullYear() - dobDate.getFullYear();
+
+    // Kiểm tra xem ngày sinh đã qua chưa trong năm nay
+    if (
+        currentDate.getMonth() < dobDate.getMonth() ||
+        (currentDate.getMonth() === dobDate.getMonth() && currentDate.getDate() < dobDate.getDate())
+    ) {
+        return age - 1;
+    }
+
+    return age;
+}
+
+
+
+
+
+
