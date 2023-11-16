@@ -14,6 +14,7 @@ import com.example.nail.service.combo.request.ComboSaveRequest;
 import com.example.nail.service.combo.response.ComboEditResponse;
 import com.example.nail.service.combo.response.ComboListResponse;
 import com.example.nail.service.request.SelectOptionRequest;
+import com.example.nail.service.response.SelectOptionResponse;
 import com.example.nail.util.AppMessage;
 import com.example.nail.util.AppUtil;
 import lombok.AllArgsConstructor;
@@ -37,6 +38,11 @@ public class ComboService {
     private ComboRepository comboRepository;
     private FileRepository fileRepository;
     private ComboProductRepository comboProductRepository;
+    public List<SelectOptionResponse> findAll(){
+        return comboRepository.findAll().stream()
+                .map(e->new SelectOptionResponse(e.getId().toString(), e.getName()))
+                .collect(Collectors.toList());
+    }
     public Page<ComboListResponse> findAllComboList(String search,Pageable pageable, BigDecimal min, BigDecimal max ){
         return comboRepository.searchAllByService(search,pageable,min,max)
                 .map(combo -> ComboListResponse.builder()

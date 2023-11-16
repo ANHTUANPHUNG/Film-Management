@@ -265,45 +265,6 @@ function renderItemStr(item) {
                 </tr>`
 }
 
-function getDataInput() {
-    return [
-        {
-            label: 'Name',
-            name: 'customerName',
-            value: billSelected.customerName,
-            required: true,
-            pattern: "^[A-Za-z ]{6,20}",
-            message: "Username must have minimum is 6 characters and maximum is 20 characters",
-        },
-
-        {
-            label: 'Phone',
-            name: 'customerPhone',
-            value: billSelected.customerPhone,
-            required: true,
-            // pattern: "^[A-Za-z ]{6,20}",
-            message: "Username must have minimum is 6 characters and maximum is 20 characters",
-        },
-        {
-            label: 'Quantity',
-            name: 'customerQuantity',
-            value: billSelected.customerQuantity,
-            required: true,
-            // pattern: "^[A-Za-z ]{6,20}",
-            message: "Username must have minimum is 6 characters and maximum is 20 characters",
-        },
-        {
-            label: 'Appointment Time',
-            name: 'appointmentTime',
-            type:"datetime-local",
-            value: billSelected.appointmentTime,
-            required: true,
-            // pattern: "^[A-Za-z ]{6,20}",
-            // message: "Username must have minimum is 6 characters and maximum is 20 characters",
-        },
-
-    ];
-}
 const clearForm = () => {
     onChangeSelect2('#user', null);
     onChangeSelect2('#products', null);
@@ -324,9 +285,7 @@ async function getList() {
 
 window.onload = async () => {
     await getList();
-    onLoadSort();
     renderForm(formBody, getDataInput());
-
 }
 function renderTBody(items) {
     let str = '';
@@ -405,13 +364,15 @@ const genderPagination = () => {
         getList();
     }
     for (let i = 1; i < ePages.length - 1; i++) {
-        if(i === pageable.page){
+        const currentPageId = ePages[i].id;
+
+        if (currentPageId === pageable.page) {
             continue;
         }
         ePages[i].onclick = () => {
-            pageable.page = i;
+            pageable.page = parseInt(currentPageId, 10); // Convert id to integer
             getList();
-        }
+        };
     }
 }
 const onSearch = (e) => {
@@ -426,16 +387,7 @@ const searchInput = document.querySelector('#search');
 searchInput.addEventListener('search', () => {
     onSearch(event)
 });
-const onLoadSort = () => {
-    ePrice.onclick = () => {
-        let sort = 'price,desc'
-        if(pageable.sortCustom?.includes('price') &&  pageable.sortCustom?.includes('desc')){
-            sort = 'price,asc';
-        }
-        pageable.sortCustom = sort;
-        getList();
-    }
-}
+
 
 
 

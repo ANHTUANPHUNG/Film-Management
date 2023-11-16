@@ -15,6 +15,7 @@ import com.example.nail.service.combo.request.ComboEditRequest;
 import com.example.nail.service.combo.request.ComboSaveRequest;
 import com.example.nail.service.combo.response.ComboEditResponse;
 import com.example.nail.service.request.SelectOptionRequest;
+import com.example.nail.service.response.SelectOptionResponse;
 import com.example.nail.service.user.request.UserEditRequest;
 import com.example.nail.service.user.request.UserCreateRequest;
 import com.example.nail.service.user.response.UserEditResponse;
@@ -40,7 +41,12 @@ import java.util.stream.Collectors;
 public class UserService {
     private FileRepository fileRepository;
     private UserRepository userRepository;
-    public Page<UserListResponse> findAll(String search, Pageable pageable){
+    public List<SelectOptionResponse> findAll(){
+        return userRepository.findAll().stream().map(
+                e-> new SelectOptionResponse(e.getId().toString(),e.getName()))
+                .collect(Collectors.toList());
+    }
+    public Page<UserListResponse> findAllUser(String search, Pageable pageable){
         return userRepository.searchAllByUserName(search,pageable)
                 .map(e->UserListResponse.builder()
                         .id(e.getId())

@@ -1,6 +1,6 @@
 const comboForm = document.getElementById('packageForm');
 const tBodyPackage = document.getElementById('tBodyPackage');
-const ePagination = document.getElementById('pagination')
+const paginationCombo = document.getElementById('paginationCombo')
 const eSearch = document.getElementById('search')
 const ePriceRange = document.getElementById('priceRange');
 const ePrice = document.getElementById('price-check');
@@ -216,11 +216,16 @@ comboForm.onsubmit = async (e) => {
         })
     }
     if (comboSelected.id) {
-        await editProduct(data);
+        await editPackage(data);
     } else {
-        await createProduct(data)
+        await createPackage(data)
     }
     // await renderTable();
+}
+function onChangeSelect2(selector, value){
+    const element = $(selector);
+    element.val(value);
+    element.change();
 }
 
 async function renderTable() {
@@ -239,7 +244,7 @@ const onShowCreate = () => {
 
 }
 // create submit
-async function createProduct(data) {
+async function createPackage(data) {
     const response = await fetch('/api/combos', {
 
         method: 'POST',
@@ -387,7 +392,7 @@ function removeImageData(index) {
 }
 
 // edit submit
-async function  editProduct (data){
+async function  editPackage (data){
 
     const response = await fetch('/api/combos/'+data.id, {
         method: 'PUT',
@@ -514,6 +519,7 @@ async function deleteItem(itemId) {
 function clearForm() {
     const areaError = $('.areaError')
     areaError.empty();
+    onChangeSelect2('#products', null);
 
     idImages = [];
     idPoster = [];
@@ -545,7 +551,7 @@ function clearForm() {
 }
 
 const genderPagination = () => {
-    ePagination.innerHTML = '';
+    paginationCombo.innerHTML = '';
     let str = '';
 
     // Xác định khoảng trang cần hiển thị (ví dụ: 5 trang xung quanh trang hiện tại)
@@ -562,7 +568,6 @@ const genderPagination = () => {
     if (endPage > pageable.totalPages) {
         endPage = pageable.totalPages;
     }
-
     // Generate "Previous" button
     str += `<li class="page-item ${pageable.first ? 'disabled' : ''}">
               <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
@@ -580,9 +585,9 @@ const genderPagination = () => {
               <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Next</a>
             </li>`
 
-    ePagination.innerHTML = str;
+    paginationCombo.innerHTML = str;
 
-    const ePages = ePagination.querySelectorAll('li');
+    const ePages = paginationCombo.querySelectorAll('li');
     const ePrevious = ePages[0];
     const eNext = ePages[ePages.length - 1];
 
@@ -601,13 +606,15 @@ const genderPagination = () => {
         getList();
     }
     for (let i = 1; i < ePages.length - 1; i++) {
-        if (i === pageable.page) {
+        const currentPageId = ePages[i].id;
+
+        if (currentPageId === pageable.page) {
             continue;
         }
         ePages[i].onclick = () => {
-            pageable.page = i;
+            pageable.page = parseInt(currentPageId, 10); // Convert id to integer
             getList();
-        }
+        };
     }
 }
 const onSearch = (e) => {

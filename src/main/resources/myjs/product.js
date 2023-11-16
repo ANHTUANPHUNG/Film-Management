@@ -561,14 +561,17 @@ const genderPagination = () => {
         pageable.page += 1;
         getList();
     }
+
     for (let i = 1; i < ePages.length - 1; i++) {
-        if (i === pageable.page) {
+        const currentPageId = ePages[i].id;
+
+        if (currentPageId === pageable.page) {
             continue;
         }
         ePages[i].onclick = () => {
-            pageable.page = i;
+            pageable.page = parseInt(currentPageId, 10); // Convert id to integer
             getList();
-        }
+        };
     }
 }
 const onSearch = (e) => {
@@ -734,7 +737,7 @@ for (var i = 0; i < eMenubar.length; i++) {
 }
 document.getElementById("menu-service").classList.add("active");
 
-function validateName(inputField) {
+function validateNameProduct(inputField) {
     const nameValue = inputField.value;
     const vietnameseWithDiacriticsAndLetterRegex = /^[A-Za-zÀ-ỹ\s]*[A-Za-zÀ-ỹ]+[A-Za-zÀ-ỹ\s]*$/;
     if (!vietnameseWithDiacriticsAndLetterRegex.test(nameValue)) {
@@ -753,7 +756,7 @@ function validateName(inputField) {
     }
 }
 
-function validateDescription(inputField) {
+function validateDescriptionProduct(inputField) {
     const descriptionValue = inputField.value;
 
     const validDescriptionRegex = /^[^\d]*[A-Za-zÀ-ỹ][^\d]*$/;
@@ -774,10 +777,8 @@ function validateDescription(inputField) {
 }
 
 
-function validatePrice(inputField) {
+function validatePriceProduct(inputField) {
     const priceValue = inputField.value;
-
-    // Kiểm tra xem giá trị có phải là một số hợp lệ và nằm trong khoảng từ 10.000 đến 1.000.000 hay không
     const isValidPrice = !isNaN(priceValue) && parseFloat(priceValue) >= 10000 && parseFloat(priceValue) <= 1000000;
 
     if (!isValidPrice) {

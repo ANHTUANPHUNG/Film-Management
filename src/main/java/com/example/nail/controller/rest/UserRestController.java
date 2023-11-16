@@ -2,6 +2,7 @@ package com.example.nail.controller.rest;
 
 import com.example.nail.service.combo.request.ComboEditRequest;
 import com.example.nail.service.combo.request.ComboSaveRequest;
+import com.example.nail.service.response.SelectOptionResponse;
 import com.example.nail.service.user.UserService;
 import com.example.nail.service.user.request.UserCreateRequest;
 import com.example.nail.service.user.request.UserEditRequest;
@@ -15,6 +16,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/users")
 @AllArgsConstructor
@@ -23,12 +26,9 @@ public class UserRestController {
     @GetMapping
     public ResponseEntity<?> findAll(@PageableDefault(size = 5) Pageable pageable,
                                      @RequestParam(defaultValue = "") String search){
-        return new ResponseEntity<>(userService.findAll(search,pageable), HttpStatus.OK);
+        return new ResponseEntity<>(userService.findAllUser(search,pageable), HttpStatus.OK);
     }
-//    @GetMapping("/{id}")
-//    public ResponseEntity<?> findAllById(@PathVariable Long id){
-//        return new ResponseEntity<>(userService.findById(id), HttpStatus.OK);
-//    }
+
     @PostMapping
     public ResponseEntity<?> create(@RequestBody UserCreateRequest userCreateRequest, BindingResult bindingResult){
         userCreateRequest.validate(userCreateRequest,bindingResult);
@@ -48,12 +48,14 @@ public class UserRestController {
     }
     @PutMapping("/{id}")
     public ResponseEntity<?> update(@RequestBody UserEditRequest userEditRequest , BindingResult bindingResult, @PathVariable Long id) throws Exception {
-        userEditRequest.validate(userEditRequest, bindingResult);
+        userEditRequest.setUserService(userService);
 
+        userEditRequest.validate(userEditRequest, bindingResult);
         if (bindingResult.hasFieldErrors()) {
             return AppUtil.mapErrorToResponse(bindingResult);
         }
         userService.update(userEditRequest,id);
         return ResponseEntity.noContent().build();
     }
+
 }

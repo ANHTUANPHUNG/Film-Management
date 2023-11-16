@@ -35,12 +35,12 @@ public class ProductEditRequest implements Validator {
         String name = productEditRequest.name;
         String description = productEditRequest.description;
         String price = productEditRequest.price;
-        if (name.length() < 1) {
-            errors.rejectValue("name", "name.length", "Tên phải có ít nhất là 1 ký tự.");
+        if (name.length() < 6) {
+            errors.rejectValue("name", "name.length", "Tên phải có ít nhất là 6 ký tự.");
         }
 
-        if (description.length() < 1) {
-            errors.rejectValue("description", "description.length", "Miêu tả chỉ phải có ít nhất là 1 ký tự.");
+        if (description.length() < 6) {
+            errors.rejectValue("description", "description.length", "Miêu tả chỉ phải có ít nhất là 6 ký tự.");
         }
 
         if (!isNumeric(price)) {

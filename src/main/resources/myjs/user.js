@@ -17,7 +17,7 @@ const dobError = document.getElementById("dobError");
 const nameError = document.getElementById("nameError");
 const posterError = document.getElementById("posterError");
 const saveButton = document.getElementById("save");
-const ePagination = document.getElementById('pagination')
+const paginationUser = document.getElementById('paginationUser')
 
 let users = [];
 let userSelected = {};
@@ -35,22 +35,22 @@ let pageable ={
     search: "",
     sortUser: "id,desc"
 }
+console.log(pageable)
 async function getList(){
     const result = await (await fetch(`/api/users?page=${pageable.page - 1 || 0}&sort=${pageable.sortUser}&search=${pageable.search || ''}`)).json()
-
+    pageable = {
+        ...pageable,
+        ...result
+    };
     genderPagination();
     renderTBody(result.content);
 }
 const genderPagination = () => {
-    ePagination.innerHTML = '';
+    paginationUser.innerHTML = '';
     let str = '';
-
-    // Xác định khoảng trang cần hiển thị (ví dụ: 5 trang xung quanh trang hiện tại)
     const maxPagesToShow = 5;
     const pagesToLeft = Math.floor(maxPagesToShow / 2);
     const pagesToRight = maxPagesToShow - pagesToLeft;
-
-    // Tính toán trang đầu và trang cuối cần hiển thị
     let startPage = pageable.page - pagesToLeft;
     if (startPage < 1) {
         startPage = 1;
@@ -58,28 +58,29 @@ const genderPagination = () => {
     let endPage = startPage + maxPagesToShow - 1;
     if (endPage > pageable.totalPages) {
         endPage = pageable.totalPages;
+        startPage = Math.max(1, endPage - maxPagesToShow + 1); // Đảm bảo rằng số lượng trang được hiển thị không vượt quá totalPages
     }
 
     // Generate "Previous" button
-    str += `<li class="page-item ${pageable.first ? 'disabled' : ''}">
+    str += `<li class="page-item ${pageable.startPage ? 'disabled' : ''}">
               <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
             </li>`
 
     // Generate page numbers
     for (let i = startPage; i <= endPage; i++) {
-        str += `<li class="page-item ${(pageable.page) === i ? 'active' : ''}" aria-current="page">
+        str += `<li class="page-item ${(pageable.page) === i ? 'active' : ''}" id="${i}" aria-current="page">
                     <a class="page-link" href="#">${i}</a>
                 </li>`
     }
 
     // Generate "Next" button
-    str += `<li class="page-item ${pageable.last ? 'disabled' : ''}">
+    str += `<li class="page-item ${pageable.endPage ? 'disabled' : ''}">
               <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Next</a>
             </li>`
 
-    ePagination.innerHTML = str;
+    paginationUser.innerHTML = str;
 
-    const ePages = ePagination.querySelectorAll('li');
+    const ePages = paginationUser.querySelectorAll('li');
     const ePrevious = ePages[0];
     const eNext = ePages[ePages.length - 1];
 
@@ -90,6 +91,7 @@ const genderPagination = () => {
         pageable.page -= 1;
         getList();
     }
+
     eNext.onclick = () => {
         if (pageable.page === pageable.totalPages) {
             return;
@@ -98,13 +100,15 @@ const genderPagination = () => {
         getList();
     }
     for (let i = 1; i < ePages.length - 1; i++) {
-        if (i === pageable.page) {
+        const currentPageId = ePages[i].id;
+
+        if (currentPageId === pageable.page) {
             continue;
         }
         ePages[i].onclick = () => {
-            pageable.page = i;
+            pageable.page = parseInt(currentPageId, 10); // Convert id to integer
             getList();
-        }
+        };
     }
 }
 function renderTBody(items) {
@@ -122,8 +126,8 @@ function renderItemStr(item) {
                     <td>
                         ${item.id}
                     </td>
-                    <td onmouseover="showTooltip(this)" data-id="${item.id}">
-                        ${item.userName}
+                    <td >
+                       <span onmouseover="showTooltip(this)" data-id="${item.id}"> ${item.userName}</span>
                     </td>
                     
                     <td>
@@ -137,12 +141,8 @@ function renderItemStr(item) {
                     </td>
                    
                     <td style="width: 120px;" >
-                        <a class="btn detail" data-id="${item.id}" onclick="onShowDetail(${item.id})" id ="detail" style="padding-left: 5px;height: 37px;    width: 47px;
-">
-                            <i class="fas fa-info-circle text-info"></i>
-                        </a>
-                        <a class="btn edit" data-id="${item.id}" onclick="onShowEdit(${item.id})" id="edit" style="padding: 0;     width: 21px;
-">
+                        
+                        <a class="btn edit" data-id="${item.id}" onclick="onShowEdit(${item.id})" id="edit" style="padding: 0;     width: 21px;">
                             <i class="fa-regular fa-pen-to-square text-primary"></i>
                         </a>
                          
@@ -158,7 +158,7 @@ async function showTooltip(element) {
     // Set the position to the right of the hovered element
     const rect = element.getBoundingClientRect();
     tooltipElement.style.position = "fixed"; // Use fixed position for consistent placement
-    tooltipElement.style.top = "125px";
+    tooltipElement.style.top = rect.top + "px";
     tooltipElement.style.left = rect.right + "px";
     // tooltipElement.style.right = rect.right + "px";
 
@@ -187,14 +187,13 @@ async function fetchUserData(userId) {
                 </div>
             </div>`;
 }
-function getDataFromPackage(form) {
+function getDataFromUser(form) {
     event.preventDefault()
     const data = new FormData(form);
     return Object.fromEntries(data.entries())
 }
 userForm.onsubmit = async (e) => {
-    const areaError = $('.area-error');
-    areaError.empty();
+
 
     let hasError = false;
 
@@ -202,31 +201,31 @@ userForm.onsubmit = async (e) => {
         nameError.textContent = "Tên là  bắt buộc.";
         hasError = true;
     } else {
-        nameError.textContent = ''; 
+        nameError.textContent = '';
     }
     if (emailInput.value.trim() === "") {
         emailError.textContent = "Email là  bắt buộc.";
         hasError = true;
     } else {
-        emailError.textContent = ''; 
+        emailError.textContent = '';
     }
     if (phoneInput.value.trim() === "") {
         phoneError.textContent = "Số điện thoại là  bắt buộc.";
         hasError = true;
     } else {
-        phoneError.textContent = ''; 
+        phoneError.textContent = '';
     }
     if (dobInput.value.trim() === "") {
         dobError.textContent = "Ngày sinh là  bắt buộc.";
         hasError = true;
     } else {
-        dobError.textContent = ''; 
+        dobError.textContent = '';
     }
     if (userNameInput.value.trim() === "") {
         userNameError.textContent = "Tên đăng nhập là  bắt buộc.";
         hasError = true;
     } else {
-        userNameError.textContent = ''; 
+        userNameError.textContent = '';
     }
     if (passwordInput.value.trim() === "") {
         passwordError.textContent = "Mật khẩu là  bắt buộc.";
@@ -248,7 +247,7 @@ userForm.onsubmit = async (e) => {
         return;
     }
 
-    let data = getDataFromPackage(userForm);
+    let data = getDataFromUser(userForm);
 
 
     data = {
@@ -258,16 +257,16 @@ userForm.onsubmit = async (e) => {
         
     }
     if (userSelected.id) {
-        await editProduct(data);
+        await editUser(data);
     } else {
-        await createProduct(data)
+        await createUser(data)
     }
     // await renderTable();
 }
 
 async function renderTable() {
 
-    const result = await (await fetch(`/api/users?page=${pageable.page - 1 || 0}&sort=${pageable.sortCustom || 'id,desc'}&search=${pageable.search || ''}`)).json()
+    const result = await (await fetch(`/api/users?page=${pageable.page - 1 || 0}&sort=${pageable.sortUser || 'id,desc'}&search=${pageable.search || ''}`)).json()
     users = result.content;
     renderTBody(users);
 }
@@ -281,7 +280,7 @@ const onShowCreate = () => {
 
 }
 // create submit
-async function createProduct(data) {
+async function createUser(data) {
     const response = await fetch('/api/users', {
 
         method: 'POST',
@@ -327,28 +326,40 @@ async function createProduct(data) {
                 errorFullNameElement.innerText = responseJSON.name;
                 errorFullNameElement.style.color= "red"
             }
-            const errorEmailElement = document.getElementById("descriptionError");
-            if ("description" in responseJSON) {
+            const errorEmailElement = document.getElementById("phoneError");
+            if ("phone" in responseJSON) {
                 errorEmailElement.style.display = "block";
-                errorEmailElement.innerText = responseJSON.description;
+                errorEmailElement.innerText = responseJSON.phone;
                 errorEmailElement.style.color= "red"
             }
-            const productsErrorElement = document.getElementById("productsError");
-            if ("idProducts" in responseJSON) {
+            const productsErrorElement = document.getElementById("dobError");
+            if ("dob" in responseJSON) {
                 productsErrorElement.style.display = "block";
-                productsErrorElement.innerText = responseJSON.idProducts;
+                productsErrorElement.innerText = responseJSON.dob;
                 productsErrorElement.style.color= "red"
             }
-            const errorAddressElement = document.getElementById("priceError");
-            if ("price" in responseJSON) {
-                errorAddressElement.style.display = "block";
-                errorAddressElement.innerText = responseJSON.price;
-                errorAddressElement.style.color= "red"
+            const emailErrorElement = document.getElementById("emailError");
+            if ("email" in responseJSON) {
+                emailErrorElement.style.display = "block";
+                emailErrorElement.innerText = responseJSON.email
+                emailErrorElement.style.color= "red"
+            }
+            const userNameErrorElement = document.getElementById("userNameError");
+            if ("userName" in responseJSON) {
+                userNameErrorElement.style.display = "block";
+                userNameErrorElement.innerText = responseJSON.userName;
+                userNameErrorElement.style.color= "red"
+            }
+            const passwordErrorElement = document.getElementById("passwordError");
+            if ("password" in responseJSON) {
+                passwordErrorElement.style.display = "block";
+                passwordErrorElement.innerText = responseJSON.password;
+                passwordErrorElement.style.color= "red"
             }
             const errorPosterElement = document.getElementById("posterError");
-            if ("poster" in responseJSON) {
+            if ("avatar" in responseJSON) {
                 errorPosterElement.style.display = "block";
-                errorPosterElement.innerText = responseJSON.poster;
+                errorPosterElement.innerText = responseJSON.avatar;
                 errorPosterElement.style.color= "red"
             }
         }
@@ -387,7 +398,7 @@ const onShowEdit = async (id) => {
 
 
 // edit submit
-async function  editProduct (data){
+async function  editUser (data){
 
     const response = await fetch('/api/users/'+data.id, {
         method: 'PUT',
@@ -428,31 +439,43 @@ async function  editProduct (data){
     } else {
         const responseJSON = await response.json();
         if (responseJSON) {
-            console.log(responseJSON)
             const errorFullNameElement = document.getElementById("nameError");
             if ("name" in responseJSON) {
                 errorFullNameElement.style.display = "block";
                 errorFullNameElement.innerText = responseJSON.name;
                 errorFullNameElement.style.color= "red"
             }
-            const errorEmailElement = document.getElementById("priceError");
-            if ("price" in responseJSON) {
+            const errorEmailElement = document.getElementById("phoneError");
+            if ("phone" in responseJSON) {
                 errorEmailElement.style.display = "block";
-                errorEmailElement.innerText = responseJSON.price;
+                errorEmailElement.innerText = responseJSON.phone;
                 errorEmailElement.style.color= "red"
             }
-            const productsErrorElement = document.getElementById("productsError");
-            if ("idProducts" in responseJSON) {
+            const productsErrorElement = document.getElementById("dobError");
+            if ("dob" in responseJSON) {
                 productsErrorElement.style.display = "block";
-                productsErrorElement.innerText = responseJSON.idProducts;
+                productsErrorElement.innerText = responseJSON.dob;
                 productsErrorElement.style.color= "red"
             }
-            const errorAddressElement = document.getElementById("descriptionError");
-            if ("description" in responseJSON) {
-                errorAddressElement.style.display = "block";
-                errorAddressElement.innerText = responseJSON.description;
-                errorAddressElement.style.color= "red"
+            const emailErrorElement = document.getElementById("emailError");
+            if ("email" in responseJSON) {
+                emailErrorElement.style.display = "block";
+                emailErrorElement.innerText = responseJSON.email
+                emailErrorElement.style.color= "red"
             }
+            const userNameErrorElement = document.getElementById("userNameError");
+            if ("userName" in responseJSON) {
+                userNameErrorElement.style.display = "block";
+                userNameErrorElement.innerText = responseJSON.userName;
+                userNameErrorElement.style.color= "red"
+            }
+            const passwordErrorElement = document.getElementById("passwordError");
+            if ("password" in responseJSON) {
+                passwordErrorElement.style.display = "block";
+                passwordErrorElement.innerText = responseJSON.password;
+                passwordErrorElement.style.color= "red"
+            }
+
 
         }
     }
@@ -567,11 +590,11 @@ async function previewPosterFile(file) {
 }
 
 
-function validateName(inputField) {
+function validateNameUser(inputField) {
     const nameValue = inputField.value;
-    const vietnameseWithDiacriticsAndLetterRegex = /^[A-Za-zÀ-ỹ\s]*[A-Za-zÀ-ỹ]+[A-Za-zÀ-ỹ\s]*$/;
+    const vietnameseWithDiacriticsAndLetterRegex = /^[A-Za-z0-9À-ỹ\s]*[A-Za-z0-9À-ỹ]+[A-Za-z0-9À-ỹ\s]*$/;
     if (!vietnameseWithDiacriticsAndLetterRegex.test(nameValue)) {
-        nameError.textContent = "Tên phải chứa ít nhất một chữ cái và không được có số.";
+        nameError.textContent = "Họ và tên phải chứa ít nhất 6 ký tự và có thể có số.";
         nameInput.style.border= "1px solid red"
         nameError.style.fontSize = "14px";
         saveButton.disabled = true;
@@ -597,6 +620,17 @@ function validateUserName(inputField) {
         saveButton.style.opacity = 0.5;
     } else {
         userNameError.textContent = '';
+        inputField.style.border = "1px solid #d9dee3";
+        saveButton.disabled = false;
+        saveButton.style.opacity = 1;
+    }
+}
+function validatePhoneUSER(inputField) {
+    const phoneValue = inputField.value;
+    // const vietnameseWithDiacriticsAndLetterRegex = /^[A-Za-z0-9À-ỹ\s]*[A-Za-z0-9À-ỹ]+[A-Za-z0-9À-ỹ\s]*$/;
+    const isLengthValid = phoneValue.length >= 2;
+    if (isLengthValid) {
+        phoneError.textContent = '';
         inputField.style.border = "1px solid #d9dee3";
         saveButton.disabled = false;
         saveButton.style.opacity = 1;
