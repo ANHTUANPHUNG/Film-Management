@@ -147,8 +147,7 @@ $(document).ready(function () {
 });
 // xử lí khi nhấn submit
 comboForm.onsubmit = async (e) => {
-    const areaError = $('.area-error');
-    areaError.empty();
+
 
     let hasError = false;
 
@@ -491,9 +490,9 @@ async function deleteItem(itemId) {
             showCancelButton: false,
             showConfirmButton: false,
             allowOutsideClick: false
-        }).then((result) => {
+        }).then( async (result) => {
             if (result.dismiss === Swal.DismissReason.timer) {
-                Swal.fire({
+                await    Swal.fire({
                     title: 'Deleted',
                     text: 'Xóa thành công.',
                     icon: 'success',
@@ -502,8 +501,9 @@ async function deleteItem(itemId) {
                     timer: 900
                 })
             }
+            await getList();
+
         });
-        await getList();
     } else {
         Swal.fire({
             title: 'Deleted',
@@ -553,13 +553,9 @@ function clearForm() {
 const genderPagination = () => {
     paginationCombo.innerHTML = '';
     let str = '';
-
-    // Xác định khoảng trang cần hiển thị (ví dụ: 5 trang xung quanh trang hiện tại)
     const maxPagesToShow = 5;
     const pagesToLeft = Math.floor(maxPagesToShow / 2);
     const pagesToRight = maxPagesToShow - pagesToLeft;
-
-    // Tính toán trang đầu và trang cuối cần hiển thị
     let startPage = pageable.page - pagesToLeft;
     if (startPage < 1) {
         startPage = 1;
@@ -567,21 +563,23 @@ const genderPagination = () => {
     let endPage = startPage + maxPagesToShow - 1;
     if (endPage > pageable.totalPages) {
         endPage = pageable.totalPages;
+        startPage = Math.max(1, endPage - maxPagesToShow + 1); // Đảm bảo rằng số lượng trang được hiển thị không vượt quá totalPages
     }
+
     // Generate "Previous" button
-    str += `<li class="page-item ${pageable.first ? 'disabled' : ''}">
+    str += `<li class="page-item ${pageable.startPage ? 'disabled' : ''}">
               <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
             </li>`
 
     // Generate page numbers
     for (let i = startPage; i <= endPage; i++) {
-        str += `<li class="page-item ${(pageable.page) === i ? 'active' : ''}" aria-current="page">
+        str += `<li class="page-item ${(pageable.page) === i ? 'active' : ''}" id="${i}" aria-current="page">
                     <a class="page-link" href="#">${i}</a>
                 </li>`
     }
 
     // Generate "Next" button
-    str += `<li class="page-item ${pageable.last ? 'disabled' : ''}">
+    str += `<li class="page-item ${pageable.endPage ? 'disabled' : ''}">
               <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Next</a>
             </li>`
 
@@ -598,6 +596,7 @@ const genderPagination = () => {
         pageable.page -= 1;
         getList();
     }
+
     eNext.onclick = () => {
         if (pageable.page === pageable.totalPages) {
             return;

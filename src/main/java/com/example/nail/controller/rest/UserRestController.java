@@ -37,10 +37,25 @@ public class UserRestController {
         }
         return new ResponseEntity<>(userService.create(userCreateRequest), HttpStatus.CREATED);
     }
-    @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteRoom(@PathVariable Long id) {
-        userService.deleteById(id);
-        return ResponseEntity.ok("User deleted successfully");
+    @PatchMapping("/lock/{id}")
+    public ResponseEntity<String> lockUser(@PathVariable Long id) {
+        userService.lockById(id);
+        return ResponseEntity.ok("ok");
+    }
+    @PatchMapping("/unlock/{id}")
+    public ResponseEntity<String> unlockUser(@PathVariable Long id) {
+        userService.unlockById(id);
+        return ResponseEntity.ok("ok");
+    }
+    @PatchMapping("/admin/{id}")
+    public ResponseEntity<String> roleUser(@PathVariable Long id) {
+        userService.roleAdmin(id);
+        return ResponseEntity.ok("ok");
+    }
+    @PatchMapping("/user/{id}")
+    public ResponseEntity<String> roleAdmin(@PathVariable Long id) {
+        userService.roleUser(id);
+        return ResponseEntity.ok("ok");
     }
     @GetMapping("/{id}")
     public ResponseEntity<?> find(@PathVariable Long id){

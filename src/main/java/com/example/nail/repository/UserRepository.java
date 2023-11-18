@@ -7,8 +7,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
+
 public interface UserRepository extends JpaRepository<User,Long> {
     @Query(value = "SELECT u from User as u where u.name LIKE %:search OR u.email LIKE %:search OR u.userName LIKE %:search")
     Page<User> searchAllByUserName(@Param("search") String search, Pageable pageable);
-
+    List<User> findAllByDeletedFalse();
 }

@@ -15,6 +15,7 @@ public class ProductListResponse {
     private String name;
     private String description;
     private List<Long> productsId;
+    private Boolean deleted;
 
     private BigDecimal price;
     private String poster;

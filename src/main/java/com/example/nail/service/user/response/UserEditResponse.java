@@ -28,5 +28,6 @@ public class UserEditResponse {
 
     private String idAvatar;
 
-
+    private String eLock;
+    private String eRole;
 }

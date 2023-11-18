@@ -1,6 +1,6 @@
 const productForm = document.getElementById('productForm');
 const tBody = document.getElementById('tBody');
-const ePagination = document.getElementById('pagination')
+const paginationProduct = document.getElementById('paginationProduct')
 const eSearch = document.getElementById('search')
 const ePriceRange = document.getElementById('priceRange');
 const ePrice = document.getElementById('price-check');
@@ -506,15 +506,11 @@ function clearForm() {
 }
 
 const genderPagination = () => {
-    ePagination.innerHTML = '';
+    paginationProduct.innerHTML = '';
     let str = '';
-
-    // Xác định khoảng trang cần hiển thị (ví dụ: 5 trang xung quanh trang hiện tại)
     const maxPagesToShow = 5;
     const pagesToLeft = Math.floor(maxPagesToShow / 2);
     const pagesToRight = maxPagesToShow - pagesToLeft;
-
-    // Tính toán trang đầu và trang cuối cần hiển thị
     let startPage = pageable.page - pagesToLeft;
     if (startPage < 1) {
         startPage = 1;
@@ -522,28 +518,29 @@ const genderPagination = () => {
     let endPage = startPage + maxPagesToShow - 1;
     if (endPage > pageable.totalPages) {
         endPage = pageable.totalPages;
+        startPage = Math.max(1, endPage - maxPagesToShow + 1); // Đảm bảo rằng số lượng trang được hiển thị không vượt quá totalPages
     }
 
     // Generate "Previous" button
-    str += `<li class="page-item ${pageable.first ? 'disabled' : ''}">
+    str += `<li class="page-item ${pageable.startPage ? 'disabled' : ''}">
               <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
             </li>`
 
     // Generate page numbers
     for (let i = startPage; i <= endPage; i++) {
-        str += `<li class="page-item ${(pageable.page) === i ? 'active' : ''}" aria-current="page">
+        str += `<li class="page-item ${(pageable.page) === i ? 'active' : ''}" id="${i}" aria-current="page">
                     <a class="page-link" href="#">${i}</a>
                 </li>`
     }
 
     // Generate "Next" button
-    str += `<li class="page-item ${pageable.last ? 'disabled' : ''}">
+    str += `<li class="page-item ${pageable.endPage ? 'disabled' : ''}">
               <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Next</a>
             </li>`
 
-    ePagination.innerHTML = str;
+    paginationProduct.innerHTML = str;
 
-    const ePages = ePagination.querySelectorAll('li');
+    const ePages = paginationProduct.querySelectorAll('li');
     const ePrevious = ePages[0];
     const eNext = ePages[ePages.length - 1];
 
@@ -554,6 +551,7 @@ const genderPagination = () => {
         pageable.page -= 1;
         getList();
     }
+
     eNext.onclick = () => {
         if (pageable.page === pageable.totalPages) {
             return;
@@ -561,7 +559,6 @@ const genderPagination = () => {
         pageable.page += 1;
         getList();
     }
-
     for (let i = 1; i < ePages.length - 1; i++) {
         const currentPageId = ePages[i].id;
 

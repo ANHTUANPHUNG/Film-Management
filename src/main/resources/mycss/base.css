@@ -172,6 +172,60 @@ ul{
 }
 .select2 select2-container select2-container--default {
     border: 1px solid red;
+    width: 104%;
+}
+span.select2-container--default .select2-selection--single {
+    width: 104%;
+    height: 38px;
+
+}
+#divBan {
+    cursor: pointer;
+}
+#diveRole {
+    cursor: pointer;
+}
+#divPayment {
+    cursor: pointer;
+}
+#userDB {
+    cursor: pointer;
+}
+span.select2-container--default .select2-selection--multiple .select2-selection__choice {
+background-color: wheat;
+}
+span.select2-container--default.select2-container--focus .select2-selection--multiple{
+    border: solid #696cff 1px;
+    border-radius: 7px;
+}
+span.select2-container--default .select2-selection--single {
+    border: 1px solid rgb(217, 222, 227);
+
+}
+
+.select2-container--default .select2-selection--multiple {
+    /* Sử dụng thanh cuộn khi nội dung vượt quá chiều cao tối đa */
+}
+
+span.select2-container--default .select2-selection--multiple{
+    border: 1px solid rgb(217, 222, 227);
+    max-height: 250px; /* Đặt giá trị tùy chọn cho chiều cao tối đa */
+    overflow-x: auto;
+    border-radius: 7px;
+    height: 73px
+
+}
+span.select2-container--default .select2-selection--single .select2-selection__rendered{
+    color: #697a8d;
 }
 
 
+/*span.select2-container--default.select2-container--focus .select2-selection--multiple:focus{*/
+
+/*    color: #697a8d;*/
+/*    background-color: #fff;*/
+/*    border-color: rgba(249, 249, 255, 0.54);*/
+/*    outline: 0;*/
+/*    box-shadow: 0 0 0.25rem 0.05rem rgba(105, 108, 255, 0.1);*/
+
+/*}*/

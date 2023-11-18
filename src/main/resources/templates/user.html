@@ -125,7 +125,7 @@
                 <label id="poster" for="post" >
                   <i id="uploadIcon" class="fas fa-upload" style="font-size: 95px;"></i>
                 </label>
-                <input id="post" class="d-none" type="file" accept="image/*"   onchange="previewPoster(event)">
+                <input id="post" class="d-none" type="file" accept="image/*"   onchange="previewAvatar(event)">
               </div>
               <label th:class="mb-2" id="posterError" class="error-message" style="color: red;"></label>
 
@@ -196,13 +196,13 @@
         </div>
       </nav>
     </div>
-    <table class="table table-bordered table-striped">
+    <table class="table table-bordered ">
       <tr>
         <th >No</th>
         <th >UserName</th>
-        <th >Role</th>
         <th >Type</th>
-        <th >Status</th>
+        <th style="width: 10%">Role</th>
+        <th style="width: 10%">Status</th>
         <th >Action</th>
       </tr>
       <tbody id="tBodyUser">

@@ -13,17 +13,13 @@ import static org.apache.commons.lang3.StringUtils.isNumeric;
 @Data
 @NoArgsConstructor
 public class ComboEditRequest implements Validator {
-    private String id;
     private String name;
-
     private String price;
-
     private String description;
     private List<String> idProducts;
-
     private SelectOptionRequest poster;
-
     private List<SelectOptionRequest> images;
+
     @Override
     public boolean supports(Class<?> clazz) {
         return false;
@@ -31,22 +27,26 @@ public class ComboEditRequest implements Validator {
 
     @Override
     public void validate(Object target, Errors errors) {
-        ComboEditRequest comboEditRequest = (ComboEditRequest) target;
+        ComboEditRequest comboSaveRequest = (ComboEditRequest) target;
 
-        String name = comboEditRequest.name;
-        String description = comboEditRequest.description;
-        String price = comboEditRequest.price;
-        List<String> idProducts = comboEditRequest.idProducts;
+        String name = comboSaveRequest.name;
+        String description = comboSaveRequest.description;
+        String price = comboSaveRequest.price;
+        List<String> idProducts = comboSaveRequest.idProducts;
+        SelectOptionRequest poster = comboSaveRequest.poster;
 
-        if (name.length() < 1) {
-            errors.rejectValue("Name", "name.length", "Tên phải có ít nhất là 1 ký tự.");
+        if (name.length() < 6) {
+            errors.rejectValue("Name", "name.length", "Tên phải có ít nhất là 6 ký tự");
         }
 
-        if (description.length() < 1) {
-            errors.rejectValue("Description", "description.length", "Miêu tả chỉ phải có ít nhất là 1 ký tự.");
+        if (description.length() < 6) {
+            errors.rejectValue("Description", "description.length", "Miêu tả chỉ phải có ít nhất là 6 ký tự");
         }
         if (idProducts == null || idProducts.isEmpty()) {
             errors.rejectValue("idProducts", "idProducts.nullOrEmpty", "Danh sách sản phẩm không được để trống.");
+        }
+        if ( poster.getId() == null) {
+            errors.rejectValue("poster", "poster.null", "Poster không được để trống.");
         }
         if (!isNumeric(price)) {
             errors.rejectValue("Price", "price.notNumeric", "Giá sản phẩm phải là một số.");

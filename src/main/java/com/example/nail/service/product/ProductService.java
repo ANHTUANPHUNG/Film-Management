@@ -54,6 +54,7 @@ public class ProductService {
                         .price(product.getPrice())
                         .poster(String.valueOf(product.getPoster().getFileUrl()))
                         .images(String.valueOf(product.getImages()))
+                        .deleted(product.getDeleted())
                         .build());
     }
     @Transactional
@@ -108,7 +109,7 @@ public class ProductService {
 
     }
     public List<SelectOptionResponse> findAll() {
-        return productRepository.findAll()
+        return productRepository.findAllByDeletedFalse()
                 .stream().map(product -> new SelectOptionResponse(product.getId()
                         .toString(), product.getName())).collect(Collectors.toList());
     }

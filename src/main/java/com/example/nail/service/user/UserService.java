@@ -42,8 +42,8 @@ public class UserService {
     private FileRepository fileRepository;
     private UserRepository userRepository;
     public List<SelectOptionResponse> findAll(){
-        return userRepository.findAll().stream().map(
-                e-> new SelectOptionResponse(e.getId().toString(),e.getName()))
+        return userRepository.findAllByDeletedFalse().stream().map(
+                e-> new SelectOptionResponse(e.getId().toString(),e.getUserName()))
                 .collect(Collectors.toList());
     }
     public Page<UserListResponse> findAllUser(String search, Pageable pageable){
@@ -94,9 +94,26 @@ public class UserService {
         userRepository.save(userDB);
 
     }
-    public void deleteById(Long id){
+    public void lockById(Long id){
         User user = findById(id);
         user.setDeleted(true);
+        user.setELock(ELock.LOCK);
+        userRepository.save(user);
+    }
+    public void unlockById(Long id){
+        User user = findById(id);
+        user.setDeleted(false);
+        user.setELock(ELock.UNLOCK);
+        userRepository.save(user);
+    }
+    public void roleAdmin(Long id){
+        User user = findById(id);
+        user.setERole(ERole.ROLE_ADMIN);
+        userRepository.save(user);
+    }
+    public void roleUser(Long id){
+        User user = findById(id);
+        user.setERole(ERole.ROLE_USER);
         userRepository.save(user);
     }
 }

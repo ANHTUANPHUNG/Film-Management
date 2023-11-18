@@ -15,11 +15,12 @@ import java.util.List;
 
 public interface ProductRepository extends JpaRepository<Product,Long> {
     List<Product> findProductByPosterId(String poster_id);
+    List<Product> findAllByDeletedFalse();
 @Modifying
     @Query(value = "UPDATE Product set poster = null where id=:id")
     void  updatePoster(Long id);
     @Query(value = "SELECT p FROM Product p" +
-            " WHERE (p.price BETWEEN :min AND :max) " +
+            " WHERE (p.price BETWEEN :min AND :max) AND p.deleted = false "  +
             "AND  ( p.name LIKE %:search%  " +
             "OR p.description LIKE %:search%  )" )
     Page<Product> searchAllByService(@Param("search") String search, Pageable pageable , @Param("min") BigDecimal min, @Param("max") BigDecimal max);

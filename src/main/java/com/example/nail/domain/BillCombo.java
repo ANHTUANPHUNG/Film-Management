@@ -26,4 +26,9 @@ public class BillCombo {
 
     @ManyToOne
     private Bill bill;
+
+    public BillCombo( Bill bill,Combo combo) {
+        this.combo = combo;
+        this.bill = bill;
+    }
 }

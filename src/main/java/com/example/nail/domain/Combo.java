@@ -35,4 +35,7 @@ public class Combo {
 
     @OneToMany(mappedBy = "combo")
     private List<ComboProduct> comboProducts;
+
+    public Combo(Long id) {
+    }
 }

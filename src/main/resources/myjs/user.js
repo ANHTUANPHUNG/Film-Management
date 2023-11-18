@@ -35,7 +35,6 @@ let pageable ={
     search: "",
     sortUser: "id,desc"
 }
-console.log(pageable)
 async function getList(){
     const result = await (await fetch(`/api/users?page=${pageable.page - 1 || 0}&sort=${pageable.sortUser}&search=${pageable.search || ''}`)).json()
     pageable = {
@@ -121,25 +120,32 @@ function renderTBody(items) {
     }
     tBodyUser.innerHTML = str;
 }
+let itemIdUser= 0;
 function renderItemStr(item) {
+    itemIdUser= item.id
+
+
+
     return `<tr>
                     <td>
                         ${item.id}
                     </td>
                     <td >
-                       <span onmouseover="showTooltip(this)" data-id="${item.id}"> ${item.userName}</span>
-                    </td>
-                    
-                    <td>
-                        ${item.role}
+                       <span onmouseover="showTooltip(this)" data-id="${item.id}" id="userDB"> ${item.userName}</span>
                     </td>
                     <td>
                         ${item.type}
                     </td>
-                     <td>
-                        ${item.lock}
+                    <td id="eRole_${item.id}" onclick="eRoles(${item.id})">
+                        <div id="diveRole" style="border: ${item.role==="ROLE_ADMIN" ? '1px solid #e9d9d9' : ' '};background-color: ${item.role==="ROLE_ADMIN" ? '#e9d9d9' : ''};padding: 2px; border-radius: 12px;">
+                            ${item.role}
+                        </div>                    </td>
+                     <td id="ban_${item.id}" onclick="ban(${item.id})"  >
+                        <div id="divBan" style="border: ${item.lock==="LOCK" ? '1px solid #f09090' : '1px solid red '};background-color: ${item.lock==="LOCK" ? '#f09090' : 'red '};color: white ;padding: 2px; border-radius: 12px;">
+                            ${item.lock}
+                        </div>
                     </td>
-                   
+                  
                     <td style="width: 120px;" >
                         
                         <a class="btn edit" data-id="${item.id}" onclick="onShowEdit(${item.id})" id="edit" style="padding: 0;     width: 21px;">
@@ -149,18 +155,21 @@ function renderItemStr(item) {
                     </td>
                 </tr>`
 }
+
 async function showTooltip(element) {
     const userId = element.getAttribute("data-id");
     const tooltipContent = await fetchUserData(userId);
     const tooltipElement = document.createElement("div");
+    tooltipElement.id = "yourTooltipId";
+
     tooltipElement.innerHTML = tooltipContent;
 
     // Set the position to the right of the hovered element
     const rect = element.getBoundingClientRect();
     tooltipElement.style.position = "fixed"; // Use fixed position for consistent placement
-    tooltipElement.style.top = rect.top + "px";
-    tooltipElement.style.left = rect.right + "px";
-    // tooltipElement.style.right = rect.right + "px";
+    tooltipElement.style.top = rect.top -100 + "px";
+    tooltipElement.style.left = rect.right + 5 + "px"; // Add a 5px gap
+    // tooltipElement.style.left = rect.left + "px";
 
     document.body.appendChild(tooltipElement);
 
@@ -173,7 +182,6 @@ async function showTooltip(element) {
 async function fetchUserData(userId) {
     const res = await fetch(`api/users/${userId}`);
     const userData = await res.json();
-    console.log(userData.avatar)
     return `<div style="background-color: wheat; display: flex; padding: 5px 30px; border: 1px solid #697a8d; border-radius: 5px;">
                 <div>
                 <p>Name: ${userData.name}</p>
@@ -368,6 +376,7 @@ async function createUser(data) {
 
 const findById = async (id) => {
     const response = await fetch('/api/users/' + id);
+
     return await response.json();
 }
 
@@ -375,9 +384,11 @@ const findById = async (id) => {
 const onShowEdit = async (id) => {
     clearForm();
     userSelected = await findById(id);
-    console.log(userSelected)
     const poster = document.getElementById("poster");
     const img = document.createElement('img');
+    $("#userName").prop('disabled', true);
+    $("#password").prop('disabled', true);
+    $("#email").prop('disabled', true);
     img.src = userSelected.avatar;
     img.id = userSelected.idAvatar;
     img.style.width='150px';
@@ -523,7 +534,7 @@ searchInput.addEventListener('search', () => {
 
 
 
-async function previewPoster(evt) {
+async function previewAvatar(evt) {
 
     if(evt.target.files.length === 0){
         return;
@@ -541,7 +552,7 @@ async function previewPoster(evt) {
     const files = evt.target.files
     for (let i = 0; i < files.length; i++) {
         const file = files[i];
-        await previewPosterFile(file, i);
+        await previewAvatarFile(file, i);
         if (file) {
             const formData = new FormData();
             formData.append("poster", file);
@@ -572,7 +583,7 @@ async function previewPoster(evt) {
 }
 
 
-async function previewPosterFile(file) {
+async function previewAvatarFile(file) {
     const reader = new FileReader();
 
     reader.onload = function () {
@@ -627,7 +638,6 @@ function validateUserName(inputField) {
 }
 function validatePhoneUSER(inputField) {
     const phoneValue = inputField.value;
-    // const vietnameseWithDiacriticsAndLetterRegex = /^[A-Za-z0-9À-ỹ\s]*[A-Za-z0-9À-ỹ]+[A-Za-z0-9À-ỹ\s]*$/;
     const isLengthValid = phoneValue.length >= 2;
     if (isLengthValid) {
         phoneError.textContent = '';
@@ -655,7 +665,6 @@ function validatePassword(inputField) {
 }
 function validateEmail(inputField) {
     const emailValue = inputField.value;
-    // Biểu thức chính xác kiểm tra email thuộc các tên miền cụ thể (gmail, yahoo, mailinator)
     const emailRegex = /^(?=.*[@])(?=.*(gmail\.com|yahoo\.com|email\.com|mailinator\.com))(?!.*\.{2})[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
 
     if (!emailRegex.test(emailValue)) {
@@ -674,8 +683,6 @@ function validateEmail(inputField) {
 function validateDob(inputField) {
     const dobValue = inputField.value;
     const dobError = document.getElementById("dobError");
-    // const saveButton = document.getElementById("save"); // Thay thế "saveButton" bằng ID của nút lưu của bạn.
-
     if (calculateAge(dobValue) < 16) {
         dobError.textContent = "Bạn phải đủ 16 tuổi trở lên.";
         inputField.style.border = "1px solid red";
@@ -695,8 +702,6 @@ function calculateAge(dob) {
     const dobDate = new Date(dob);
     const currentDate = new Date();
     const age = currentDate.getFullYear() - dobDate.getFullYear();
-
-    // Kiểm tra xem ngày sinh đã qua chưa trong năm nay
     if (
         currentDate.getMonth() < dobDate.getMonth() ||
         (currentDate.getMonth() === dobDate.getMonth() && currentDate.getDate() < dobDate.getDate())
@@ -706,6 +711,182 @@ function calculateAge(dob) {
 
     return age;
 }
+async function ban(id){
+    const userBan = await findById(id);
+    if(userBan.elock === "UNLOCK"){
+        const { isConfirmed } = await Swal.fire({
+            title: 'Xác nhận khóa',
+            text: 'Bạn có chắc chắn muốn khóa?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Khóa',
+            cancelButtonText: 'Hủy',
+        });
+        if (!isConfirmed) {
+            return; // Người dùng đã hủy xóa
+        }
+        const response = await fetch(`/api/users/lock/${id}`, {
+            method: 'PATCH',
+        });
+
+        if (response.ok) {
+            Swal.fire({
+                title: 'Đang xử lý',
+                text: 'Vui lòng chờ...',
+                willOpen: () => {
+                    Swal.showLoading();
+                },
+                timer: 2000, // Đợi 2 giây (2000ms)
+                showCancelButton: false,
+                showConfirmButton: false,
+                allowOutsideClick: false
+            }).then(async (result) => {
+                if (result.dismiss === Swal.DismissReason.timer) {
+                    await   Swal.fire({
+                        text: 'Khóa thành công.',
+                        icon: 'success',
+                        showConfirmButton: false,
+                        position: 'top-start',
+                        timer: 900
+                    })
+                }
+
+                await getList();
+
+            });
+        }
+    } else {
+        const {isConfirmed} = await Swal.fire({
+            title: 'Xác nhận mở khóa',
+            text: 'Bạn có chắc chắn muốn mở khóa?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Mở',
+            cancelButtonText: 'Hủy',
+        });
+        if (!isConfirmed) {
+            return; // Người dùng đã hủy xóa
+        }
+        const response = await fetch(`/api/users/unlock/${id}`, {
+            method: 'PATCH',
+        });
+
+        if (response.ok) {
+            Swal.fire({
+                title: 'Đang xử lý',
+                text: 'Vui lòng chờ...',
+                willOpen: () => {
+                    Swal.showLoading();
+                },
+                timer: 2000, // Đợi 2 giây (2000ms)
+                showCancelButton: false,
+                showConfirmButton: false,
+                allowOutsideClick: false
+            }).then( async (result) => {
+                if (result.dismiss === Swal.DismissReason.timer) {
+                await    Swal.fire({
+                        text: 'Mở khóa thành công.',
+                        icon: 'success',
+                        showConfirmButton: false,
+                        position: 'top-start',
+                        timer: 900
+                    })
+                }
+                await getList();
+            });
+        }
+    }
+}
+
+async function eRoles(id){
+    const userBan = await findById(id);
+    console.log(userBan)
+    if(userBan.erole === "ROLE_USER"){
+        const { isConfirmed } = await Swal.fire({
+            title: 'Xác nhận',
+            text: 'Bạn có chắc chuyển tài khoản này thành ADMIN?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Đồng ý',
+            cancelButtonText: 'Hủy',
+        });
+        if (!isConfirmed) {
+            return; // Người dùng đã hủy xóa
+        }
+        const response = await fetch(`/api/users/admin/${id}`, {
+            method: 'PATCH',
+        });
+
+        if (response.ok) {
+            Swal.fire({
+                title: 'Đang xử lý',
+                text: 'Vui lòng chờ...',
+                willOpen: () => {
+                    Swal.showLoading();
+                },
+                timer: 2000, // Đợi 2 giây (2000ms)
+                showCancelButton: false,
+                showConfirmButton: false,
+                allowOutsideClick: false
+            }).then(async (result) => {
+                if (result.dismiss === Swal.DismissReason.timer) {
+                    await   Swal.fire({
+                        text: 'Nâng thành công.',
+                        icon: 'success',
+                        showConfirmButton: false,
+                        position: 'top-start',
+                        timer: 900
+                    })
+                }
+
+
+                await getList();
+
+            });
+        }
+    } else {
+        const {isConfirmed} = await Swal.fire({
+            title: 'Xác nhận ',
+            text: 'Bạn có hủy bỏ chức vụ cho tài khoản này?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Mở',
+            cancelButtonText: 'Hủy',
+        });
+        if (!isConfirmed) {
+            return; // Người dùng đã hủy xóa
+        }
+        const response = await fetch(`/api/users/user/${id}`, {
+            method: 'PATCH',
+        });
+
+        if (response.ok) {
+            Swal.fire({
+                title: 'Đang xử lý',
+                text: 'Vui lòng chờ...',
+                willOpen: () => {
+                    Swal.showLoading();
+                },
+                timer: 2000, // Đợi 2 giây (2000ms)
+                showCancelButton: false,
+                showConfirmButton: false,
+                allowOutsideClick: false
+            }).then( async (result) => {
+                if (result.dismiss === Swal.DismissReason.timer) {
+                    await    Swal.fire({
+                        text: 'Hủy thành công.',
+                        icon: 'success',
+                        showConfirmButton: false,
+                        position: 'top-start',
+                        timer: 900
+                    })
+                }
+                await getList();
+            });
+        }
+    }
+}
+
 
 
 

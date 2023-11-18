@@ -18,9 +18,9 @@
   </div>
   <br>
   <!-- Modal -->
-  <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+  <div class="modal fade bd-example-modal-lg" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
        aria-labelledby="staticBackdropLabel" aria-hidden="true">
-    <div class="modal-dialog" style="max-width: 600px">
+    <div class="modal-dialog modal-lg" >
       <div class="modal-content">
         <div class="modal-header" style="display: flex;justify-content: center">
           <h4 class="modal-title" id="staticBackdropLabel"  >Modal title</h4>
@@ -28,52 +28,88 @@
         </div>
         <div class="modal-body">
           <form id="billForm"  >
-            <div class="form-group col-12" >
-              <label for="name">Name:</label>
-              <input type="text" class="form-control" id="name" name="name" placeholder="Họ và tên"  oninput="validateName(this)" >
-              <div id="nameError" class="error-message" style="color: red;"></div>
-            </div>
-            <div class="form-group col-12">
-              <label for="description">Description</label>
-              <input type="text" class="form-control" id="description" placeholder="Mô tả sản phẩm" name="description" oninput="validateDescription(this)" >
-              <div id="descriptionError" class="error-message" style="color: red;"></div>
-
-            </div>
-            <div class="form-group col-lg-12">
-              <label for="price">Price</label>
-              <input type="text" class="form-control" id="price" placeholder="Gía tiền"  name="price" oninput="validatePrice(this)" >
-              <div id="priceError" class="error-message" style="color: red;"></div>
-            </div>
-            <div class="form-group col-12">
-              <label for="users">Products</label>
+            <div class="form-group row col-12 ">
+              <label for="users">User</label>
               <select style="width: 100%!important; padding: .375rem .75rem!important;"
-                      class="js-example-basic-multiple form-control" id="users" name="users"
-                      multiple="multiple">
-                <option th:each="user : ${users}" th:value="${user.value}"
-                        th:text="${user.name}"/>
+                      class="js-example-basic-single form-control" id="users" name="users" >
+                <option style="color: #697a8d;" value="" selected>Mời chọn:</option>
+                <option th:each="user : ${users}" th:value="${user.value}" th:text="${user.getName}"/>
               </select>
               <label for="users" id="usersError" class="error-message" style="color: red;"></label>
             </div>
-            <div class="form-group col-12">
-              <label for="products">Products</label>
-              <select style="width: 100%!important; padding: .375rem .75rem!important;"
-                      class="js-example-basic-multiple form-control" id="products" name="products"
-                      multiple="multiple">
-                <option th:each="product : ${products}" th:value="${product.value}"
-                        th:text="${product.name}"/>
-              </select>
-              <label for="products" id="productsError" class="error-message" style="color: red;"></label>
+            <div class="form-group row" style="display: flex">
+              <div class="form-group col-6">
+                <label for="customerName">Customer Name:</label>
+                <input type="text" class="form-control" id="customerName" name="customerName" placeholder="Họ và tên" >
+                <label for="customerName" id="customerNameError" class="error-message" style="color: red;"></label>
+              </div>
+              <div class="form-group col-6">
+                <label for="customerPhone">Customer Phone:</label>
+                <input type="tel" class="form-control" id="customerPhone" name="customerPhone" placeholder="Số điện thoại" >
+                <label for="customerPhone" id="customerPhoneError" class="error-message" style="color: red;"></label>
+              </div>
             </div>
-            <div class="form-group col-12">
-              <label for="packages">Packages</label>
-              <select style="width: 100%!important; padding: .375rem .75rem!important;"
-                      class="js-example-basic-multiple form-control" id="packages" name="packages"
-                      multiple="multiple">
-                <option th:each="combo : ${combos}" th:value="${combo.value}"
-                        th:text="${combo.name}"/>
-              </select>
-              <label for="packages" id="packagesError" class="error-message" style="color: red;"></label>
+            <div class="form-group row" style="display: flex">
+              <div class="form-group col-6" >
+                <label for="customerEmail">Customer Email:</label>
+                <input type="text" class="form-control" id="customerEmail" name="customerEmail" placeholder="Email"   >
+                <label for="customerEmail" id="customerEmailError" class="error-message" style="color: red;"></label>
+              </div>
+              <div class="form-group col-6">
+                <label for="customerQuantity">Customer Quantity:</label>
+                <input type="text" class="form-control" id="customerQuantity" name="customerQuantity" placeholder="Số lượng khách" oninput="validateCustomerQuantity()">
+                <label for="customerQuantity" id="customerQuantityError" class="error-message" style="color: red;"></label>
+              </div>
+
             </div>
+            <div class="form-group row" style="display: flex">
+              <div class="form-group col-6">
+                <label for="products">Service</label>
+                <select style="width: 100%!important; padding: .375rem .75rem!important;"
+                        class="js-example-basic-multiple form-control" id="products" name="products"
+                        multiple="multiple" oninput="validateForm()">
+                  <option th:each="product : ${products}" th:value="${product.value}"
+                          th:text="${product.name}"/>
+                </select>
+                <label for="products" id="productsError" class="error-message" style="color: red;"></label>
+              </div>
+              <div class="form-group col-6">
+                <label for="combos">Package</label>
+                <select style="width: 100%!important; padding: .375rem .75rem!important;"
+                        class="js-example-basic-multiple form-control" id="combos" name="combos"
+                        multiple="multiple" oninput="validateForm()">
+                  <option th:each="combo : ${combos}" th:value="${combo.value}"
+                          th:text="${combo.name}"/>
+                </select>
+                <label for="combos" id="combosError" class="error-message" style="color: red;"></label>
+              </div>
+            </div>
+            <div class="form-group row" style="display: flex">
+              <div class="form-group col-6" >
+                <label for="priceProducts">Price Service:</label>
+                <input type="text" class="form-control" id="priceProducts" disabled name="priceProducts" placeholder="Tổng tiền theo sản phẩm"  >
+                <label for="priceProducts" id="priceProductsError" class="error-message" style="color: red;"></label>
+              </div>
+              <div class="form-group col-6" >
+                <label for="priceCombos">Price Package:</label>
+                <input type="text" class="form-control" id="priceCombos" disabled name="priceCombos" placeholder="Tổng tiền theo gói"  >
+                <label for="priceCombos" id="priceCombosError" class="error-message" style="color: red;"></label>
+              </div>
+            </div>
+
+            <div class="form-group row" style="display: flex">
+              <div class="form-group col-6" >
+                <label for="priceBill">Price:</label>
+                <input type="text" class="form-control" id="priceBill" name="priceBill" disabled placeholder="Tổng tiền"  >
+                <label for="priceBill" id="priceBillError" class="error-message" style="color: red;"></label>
+              </div>
+              <div class="form-group col-6">
+                <label for="appointmentTime">Appointment Time:</label>
+                <input type="datetime-local" class="form-control" id="appointmentTime" name="appointmentTime" oninput="validateAppointmentTime()">
+                <label for="appointmentTime" id="appointmentTimeError" class="error-message" style="color: red;"></label>
+              </div>
+            </div>
+
             <div class="modal-footer">
               <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
               <button type="submit" class="btn "  id="save"  >Save changes</button>
@@ -122,11 +158,12 @@
     </div>
     <table class="table table-bordered table-striped">
       <tr>
-        <th style="width: 30px">No</th>
-        <th style="width: 150px">Name</th>
-        <th style="width: 150px">Description</th>
-        <th style="width: 150px">Products</th>
-        <th >Poster</th>
+        <th >No</th>
+        <th >Customer Name</th>
+        <th >Customer Quantity</th>
+        <th >Appointment Time</th>
+        <th >Price</th>
+        <th >Payment</th>
         <th >Action</th>
       </tr>
       <tbody id="tBodyBill">

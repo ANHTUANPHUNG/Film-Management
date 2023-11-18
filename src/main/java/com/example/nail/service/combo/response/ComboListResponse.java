@@ -19,6 +19,7 @@ public class ComboListResponse implements Validator {
     private String products;
     private String poster;
     private String images;
+    private Boolean deleted;
 
     @Override
     public boolean supports(Class<?> clazz) {

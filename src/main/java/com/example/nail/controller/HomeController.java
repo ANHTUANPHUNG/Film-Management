@@ -39,7 +39,7 @@ public class HomeController  {
     }
     @GetMapping("/bill")
     private ModelAndView bill(){
-        ModelAndView view = new ModelAndView("/combo");
+        ModelAndView view = new ModelAndView("/bill");
         view.addObject("products", productService.findAll());
         view.addObject("combos", comboService.findAll());
         view.addObject("users", userService.findAll());

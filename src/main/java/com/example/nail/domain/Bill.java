@@ -1,5 +1,7 @@
 package com.example.nail.domain;
 
+import com.example.nail.domain.eNum.ELock;
+import com.example.nail.domain.eNum.EPayment;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -32,7 +34,9 @@ public class Bill {
     private LocalDateTime appointmentTime;
 
     private BigDecimal price;
-
+    private Boolean deleted;
+    @Enumerated(value = EnumType.STRING)
+    private EPayment ePayment;
     @ManyToOne
     private User user;
 

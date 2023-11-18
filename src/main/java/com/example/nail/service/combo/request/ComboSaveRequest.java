@@ -35,19 +35,17 @@ public class ComboSaveRequest implements Validator {
         List<String> idProducts = comboSaveRequest.idProducts;
         SelectOptionRequest poster = comboSaveRequest.poster;
 
-        if (name.length() < 1) {
-            errors.rejectValue("Name", "name.length", "Tên phải có ít nhất là 1 ký tự");
+        if (name.length() < 6) {
+            errors.rejectValue("Name", "name.length", "Tên phải có ít nhất là 6 ký tự");
         }
 
-        if (description.length() < 1) {
-            errors.rejectValue("Description", "description.length", "Miêu tả chỉ phải có ít nhất là 1 ký tự");
+        if (description.length() < 6) {
+            errors.rejectValue("Description", "description.length", "Miêu tả chỉ phải có ít nhất là 6 ký tự");
         }
         if (idProducts == null || idProducts.isEmpty()) {
             errors.rejectValue("idProducts", "idProducts.nullOrEmpty", "Danh sách sản phẩm không được để trống.");
         }
-        if ( poster.getId() == null) {
-            errors.rejectValue("poster", "poster.null", "Poster không được để trống.");
-        }
+
         if (!isNumeric(price)) {
             errors.rejectValue("Price", "price.notNumeric", "Giá sản phẩm phải là một số.");
         } else {

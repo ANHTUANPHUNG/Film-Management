@@ -39,12 +39,12 @@ public class ComboService {
     private FileRepository fileRepository;
     private ComboProductRepository comboProductRepository;
     public List<SelectOptionResponse> findAll(){
-        return comboRepository.findAll().stream()
+        return comboRepository.findAllByDeletedFalse().stream()
                 .map(e->new SelectOptionResponse(e.getId().toString(), e.getName()))
                 .collect(Collectors.toList());
     }
-    public Page<ComboListResponse> findAllComboList(String search,Pageable pageable, BigDecimal min, BigDecimal max ){
-        return comboRepository.searchAllByService(search,pageable,min,max)
+    public Page<ComboListResponse> findAllComboList(String search, Pageable pageable, BigDecimal min, BigDecimal max) {
+        return comboRepository.searchAllByService(search, pageable, min, max)
                 .map(combo -> ComboListResponse.builder()
                         .id(combo.getId())
                         .name(combo.getName())
@@ -52,6 +52,7 @@ public class ComboService {
                         .price(combo.getPrice())
                         .poster(String.valueOf(combo.getPosterCombo().getFileUrl()))
                         .images(String.valueOf(combo.getImageCombo()))
+                        .deleted(combo.getDeleted())
                         .products(combo.getComboProducts()
                                 .stream()
                                 .map(comboProduct -> comboProduct.getProduct().getName())

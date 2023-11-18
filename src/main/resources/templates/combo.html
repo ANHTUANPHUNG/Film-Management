@@ -103,7 +103,7 @@
               <label for="products">Products</label>
               <select style="width: 100%!important; padding: .375rem .75rem!important;"
                       class="js-example-basic-multiple form-control" id="products" name="products"
-                      multiple="multiple">
+                      multiple="multiple" >
                 <option th:each="product : ${products}" th:value="${product.value}"
                         th:text="${product.name}"/>
               </select>
