@@ -35,7 +35,7 @@ public class ProductRestController {
 
     }
     @GetMapping
-    public ResponseEntity<Page<ProductListResponse>> list(@PageableDefault(size = 5) Pageable pageable,
+    public ResponseEntity<Page<ProductListResponse>> list(@PageableDefault(size = 1) Pageable pageable,
                                                           @RequestParam(defaultValue = "") String search,
                                                           @RequestParam(defaultValue = "1") BigDecimal min,
                                                           @RequestParam(defaultValue = "500000000000000000") BigDecimal max

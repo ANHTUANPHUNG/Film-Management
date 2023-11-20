@@ -508,7 +508,7 @@ function clearForm() {
 const genderPagination = () => {
     paginationProduct.innerHTML = '';
     let str = '';
-    const maxPagesToShow = 5;
+    const maxPagesToShow = 3;
     const pagesToLeft = Math.floor(maxPagesToShow / 2);
     const pagesToRight = maxPagesToShow - pagesToLeft;
     let startPage = pageable.page - pagesToLeft;

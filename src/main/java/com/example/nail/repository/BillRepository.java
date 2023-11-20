@@ -12,7 +12,7 @@ public interface BillRepository extends JpaRepository<Bill,Long> {
             "(b.customerName LIKE %:search% OR " +
             "b.customerEmail LIKE %:search% OR " +
             "b.customerPhone LIKE %:search% OR " +
-            "b.user.name LIKE %:search% OR " +
+//            "b.user.name LIKE %:search% OR " +
             "EXISTS (SELECT 1 FROM BillCombo bc WHERE bc.bill = b AND bc.combo.name LIKE %:search%) OR " +
             "EXISTS (SELECT 1 FROM BillProduct bp WHERE bp.bill = b AND bp.product.name LIKE %:search%))")
     Page<Bill> searchAllByBill(@Param("search") String search, Pageable pageable);

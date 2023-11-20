@@ -49,7 +49,7 @@ public class BillService {
                         .price(b.getPrice())
                         .appointmentTime(String.valueOf(b.getAppointmentTime()))
                         .timeBook(b.getTimeBook())
-                        .user(b.getUser().getName())
+                        .user(b.getUser() != null ? b.getUser().getName() : "Unknown User")
                         .ePayment(String.valueOf(b.getEPayment()))
                         .products(b.getBillProducts().stream()
                                 .map(BillProduct::getProductName)

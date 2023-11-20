@@ -39,11 +39,10 @@ public class Product {
 
     @OneToMany(mappedBy = "product")
     private List<ComboProduct> comboProducts;
+    @OneToMany(mappedBy = "product")
+    private List<BillProduct> billProducts;
 
     public Product(Long id) {
         this.id = id;
     }
-
-
-
 }

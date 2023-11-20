@@ -248,7 +248,7 @@ async function fetchUserData(billId) {
 
     return `<div style="background-color: wheat; display: flex; padding: 5px 30px; border: 1px solid #697a8d; border-radius: 5px;">
                 <div>
-                <p>User: ${billData.userName}</p>
+                <p>User: ${billData.userName != null ? billData.userName : "Not user"}</p>
                 <p>Email: ${billData.customerEmail}</p>
                 <p>Phone: ${billData.customerPhone}</p>
                 <p ><div style="white-space: pre-wrap; width: 400px">Products: ${billData.productsName}</div></p>

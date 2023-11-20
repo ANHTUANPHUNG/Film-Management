@@ -37,7 +37,7 @@ public class Bill {
     private Boolean deleted;
     @Enumerated(value = EnumType.STRING)
     private EPayment ePayment;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     private User user;
 
     @OneToMany(mappedBy = "bill")
