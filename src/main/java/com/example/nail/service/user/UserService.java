@@ -32,6 +32,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @AllArgsConstructor
@@ -41,6 +42,11 @@ import java.util.stream.Collectors;
 public class UserService {
     private FileRepository fileRepository;
     private UserRepository userRepository;
+    public Optional<User> findByNameIgnoreCaseOrEmailIgnoreCaseOrPhone(String loginName) {
+        return Optional.ofNullable(userRepository.findByNameIgnoreCaseOrEmailIgnoreCaseOrPhone(loginName, loginName, loginName)
+                .orElseThrow(() -> new ResourceNotFoundException
+                        (String.format(AppMessage.ID_NOT_FOUND, "User"))));
+    }
     public List<SelectOptionResponse> findAll(){
         return userRepository.findAllByDeletedFalse().stream().map(
                 e-> new SelectOptionResponse(e.getId().toString(),e.getUserName()))

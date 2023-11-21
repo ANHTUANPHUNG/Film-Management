@@ -1,13 +1,15 @@
 package com.example.nail.service.auth;
 
 
-import com.example.spa_case.model.User;
-import com.example.spa_case.model.enums.ELock;
-import com.example.spa_case.model.enums.ERole;
-import com.example.spa_case.repository.UserRepository;
-import com.example.spa_case.service.auth.request.RegisterRequest;
-import com.example.spa_case.util.AppUtil;
+import com.example.nail.domain.User;
+import com.example.nail.domain.eNum.ELock;
+import com.example.nail.domain.eNum.ERole;
+import com.example.nail.domain.eNum.EType;
+import com.example.nail.repository.UserRepository;
+import com.example.nail.service.auth.request.RegisterRequest;
+import com.example.nail.util.AppUtil;
 import lombok.AllArgsConstructor;
+
 import org.springframework.security.authentication.LockedException;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -29,8 +31,12 @@ public class AuthService implements UserDetailsService {
 
     public void register(RegisterRequest request){
         var user = AppUtil.mapper.map(request, User.class);
-        user.setRole(ERole.ROLE_USER);
-        user.setPassWord(passwordEncoder.encode(user.getPassWord()));
+
+        user.setERole(ERole.ROLE_USER);
+        user.setPassword(passwordEncoder.encode(request.getPassWord()));
+        user.setELock(ELock.UNLOCK);
+        user.setType(EType.SILVER);
+        user.setDeleted(false);
         userRepository.save(user);
     }
 
@@ -61,9 +67,9 @@ public class AuthService implements UserDetailsService {
         }
 
         var role = new ArrayList<SimpleGrantedAuthority>();
-        role.add(new SimpleGrantedAuthority(user.getRole().toString()));
+        role.add(new SimpleGrantedAuthority(user.getERole().toString()));
 
-        return new org.springframework.security.core.userdetails.User(user.getName(), user.getPassWord(), role);
+        return new org.springframework.security.core.userdetails.User(user.getName(), user.getPassword(), role);
     }
     // để làm 1. kiểm tra xem user có tồn tại trong hệ thông hay không và tìm bằng 3 field Username Email PhoneNumber
     // 2. Nếu có thì sẽ trả về User của .security.core.userdetails.User để nó lưu vô kho spring sercurity context holder
